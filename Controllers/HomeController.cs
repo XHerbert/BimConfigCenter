@@ -75,6 +75,7 @@ namespace ConfigCenterApp.Controllers
 
         public ActionResult Scene()
         {
+            //TODO:
             List<string> sceneList = new List<string> { "设备管理", "报警管理" };
             ViewBag.Scene = JsonConvert.SerializeObject(sceneList);
             return View();

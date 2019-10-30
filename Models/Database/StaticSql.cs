@@ -32,9 +32,9 @@ namespace IntegrateWebApp.Models.Database
         /// <summary>
         /// 查询场景配置
         /// </summary>
-        public static string SCENES = @"SELECT SCENE_ID Id,`PROJECT_ID` ProjectId,`MERGE_NAME` MergeName,`MERGE_MEMO` MergeMemo,
-                                        `FUNC_CODE` FunctionCode,`INTEGRATE_ID` IntegrateId,`MERGE_TIME` MergeTime,`MERGER` Merger,
-                                        `BACK_PIC` BackPicture,`SHOW_SET` ShowSet,`BORDER_LINE` BorderLine,`SHOW_SUN` ShowSun,`CAMERA` Camera,`DEF_API` DefineAPI FROM `gfm_bim_appinfo` WHERE `PROJECT_ID`={0} ";
+        public static string SCENES = @"SELECT SCENE_ID sceneId,`PROJECT_ID` projectId,`MERGE_NAME` mergeName,`MERGE_MEMO` mergeMemo,
+                                        `FUNC_CODE` funcCode,`INTEGRATE_ID` integrateId,`MERGER` merger,
+                                        `BACK_PIC` backPic,`SHOW_SET` showSet,`BORDER_LINE` borderLine,`SHOW_SUN` showSun,`CAMERA` camera,`DEF_API` defApi FROM `gfm_bim_appinfo` WHERE `PROJECT_ID`={0} ";
 
     }
 }

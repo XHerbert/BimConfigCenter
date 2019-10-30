@@ -16,8 +16,10 @@
 <script src="~/Scripts/bootstrap-switch.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.15.3/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="~/layer/layer.js"></script>
 <script type="text/javascript">
     let scenes = @Html.Raw(ViewBag.Scene);
+    let host = 'http://10.1.73.50:8079/api/scene';
     $(function () {
         let $table = $('#table');
         let $button = $('#button');
@@ -27,97 +29,21 @@
             $table.bootstrapTable('insertRow', {
                 index: 10,
                 row: {
-                    id: '',
-                    name: '',
-                    price: ''
-                }
+                    FunctionCode: '',
+                    MergeName: '',
+                    IntegrateId: '',
+                    MergeMemo: '',
+                    BackPicture: '',
+                    ShowSet: '',
+                    BorderLine: true,
+                    ShowSun: false,
+                    Camera:'',
+                    DefineAPI: '',
+                    MergeTime:''
+                },
+                contenteditable:true
             });
-        });
-
-        $table.bootstrapTable({
-            url: '/Operation/FetchScenes',
-            toolbar: '#toolbar',
-            clickEdit: false,
-            //showToggle: true,
-            pagination: true,       //显示分页条
-            //showColumns: true,
-            //showPaginationSwitch: true,     //显示切换分页按钮
-            //showRefresh: true,      //显示刷新按钮
-            clickToSelect: true,  //点击row选中radio或CheckBox
-            columns: [
-                {
-                    checkbox: true
-                },
-                {
-                    field: 'Id',
-                    visible: false
-                },
-                {
-                    field: 'FunctionCode',
-                    title: '应用节点',
-                    edit: false
-                },
-                {
-                    field: 'MergeName',
-                    title: '场景名称'
-                },
-                {
-                    field: 'IntegrateId',
-                    title: '模型集成ID'
-                },
-                {
-                    field: 'MergeMemo',
-                    title: '场景说明'
-                },
-                {
-                    field: 'BackPicture',
-                    title: '背景天空盒'
-                },
-                {
-                    field: 'ShowSet',
-                    title: '默认效果设置'
-                },
-                {
-                    field: 'BorderLine',
-                    title: '显示轮廓线',
-                    formatter: borderFormatter
-                },
-                {
-                    field: 'ShowSun',
-                    title: '启用环境光照',
-                    formatter: roundFormatter
-                },
-                {
-                    field: 'Camera',
-                    title: '默认相机位'
-                },
-                {
-                    field: 'DefineAPI',
-                    title: 'API接口'
-                },
-                {
-                    field: 'MergeTime',
-                    title: '集成时间',
-                    width: '150px',
-                    formatter: function (value, row, index) {
-                        return changeDateFormat(value)
-                    }
-                },
-                {
-                    title: '操作',
-                    formatter: buttonFormatter
-                }
-            ],
-
-            onClickCell: function (field, value, row, $element) {
-                //$element.attr('contenteditable', true);
-                //$element.blur(function () {
-                //    let index = $element.parent().data('index');
-                //    let tdValue = $element.html();
-
-                //    saveData(index, field, tdValue);
-                //})
-            }
+            delayRender(10);
         });
 
         $getTableData.click(function () {
@@ -132,39 +58,76 @@
             })
         }
 
-        function roundFormatter(value, row, index) {
-            //console.log(value, row, index);
-            let __value = row['BorderLine'];
+        function borderFormatter(value, row, index) {
+            let __value = row['borderLine'];
             let __content = '';
             if (__value) {
-                __content = '<input type="checkbox" data-on-text="启用" data-off-text="禁用" data-on-color="success" name="border_checkbox" checked>';
+                __content = '<input type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="border_checkbox" checked>';
             } else {
-                __content = '<input type="checkbox" data-on-text="启用" data-off-text="禁用" data-on-color="success" name="border_checkbox">';
+                __content = '<input type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="border_checkbox">';
             }
             return [__content];
         }
 
-        function borderFormatter(value, row, index) {
-            //console.log(value, row, index);
-            let __value = row['ShowSun'];
+        function roundFormatter(value, row, index) {
+            let __value = row['showSun'];
             let __content = '';
             if (__value) {
-                __content = '<input type="checkbox" data-on-text="显示" data-off-text="隐藏" name="round_checkbox" checked>';
+                __content = '<input type="checkbox" data-on-text="启用" data-off-text="禁用" data-on-color="success" data-off-color="danger" name="border_checkbox" checked>';
             } else {
-                __content = '<input type="checkbox" data-on-text="显示" data-off-text="隐藏" name="round_checkbox">';
+                __content = '<input type="checkbox" data-on-text="启用" data-off-text="禁用" data-on-color="success" data-off-color="danger" name="border_checkbox">';
             }
             return [__content];
+        }
+
+        $.fn.updateRowData = (id) => {
+            let __row = $table.bootstrapTable('getRowByUniqueId', id);
+            // 数据转换
+            __row['borderLine'] == true ? __row['borderLine'] = 1 : __row['borderLine'] = 0;
+            __row['showSun']  == true ? __row['showSun'] = 1 : __row['showSun'] = 0;
+            let options = {
+                url: host + "/updateScene",
+                data: JSON.stringify(__row),
+                type: 'PUT',
+                contentType:'application/json',
+                success: (response) => {
+                    if (response.code === 20000) {
+                        layer.msg("场景[" + __row['mergeName']+"]更新成功！");
+                    } else {
+                        layer.msg(response.message);
+                    }
+                }
+            };
+            console.log(__row);
+            $.ajax(options);
+        }
+
+        $.fn.createRowData = (row_data) => {
+            let options = {
+                url: host+"createScene",
+                data: JSON.stringify(row_data),
+                type: 'POST',
+                contentType: 'application/json',
+                success: (response) => {
+                    if (response.code === 20000) {
+                        layer.msg("场景创建成功！");
+                    } else {
+                        layer.msg(response.message);
+                    }
+                }
+            };
+            $.ajax(options);
         }
 
         function buttonFormatter(value, row, index) {
             let __txt = '修改';
             let __style = 'btn-warning';
-            let __isNew = row['Id'];
+            let __isNew = row['sceneId'];
             if (!__isNew) {
                 __style = 'btn-success';
                 __txt = '保存';
             }
-            return ['<button onclick = "alert('+row['Id']+')" class="btn ' + __style + ' btn-small">' + __txt + '</button>']
+            return ['<button onclick = "$.fn.updateRowData(' + row['sceneId']+')" class="btn ' + __style + ' btn-small">' + __txt + '</button>']
         }
 
         function dropFormat() {
@@ -178,7 +141,7 @@
 
         function changeDateFormat(cellval) {
             var dateVal = cellval + "";
-            if (cellval != null) {
+            if (cellval != null && cellval!='') {
                 var date = new Date(parseInt(dateVal.replace("/Date(", "").replace(")/", ""), 10));
                 var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
                 var currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
@@ -208,13 +171,133 @@
         }
 
         //延时渲染
-        setTimeout(() =>
-        {
-            $("[name='round_checkbox']").filter(checkRoundTrueValue).bootstrapSwitch("state", true);
+        function delayRender(time) {
+            setTimeout(() => {
+                $("[name='round_checkbox']").filter(checkRoundTrueValue).bootstrapSwitch("state", true);
+                $("[name='round_checkbox']").filter(checkRoundFalseValue).bootstrapSwitch("state", false);
+                $("[name='border_checkbox']").filter(checkBorderTrueValue).bootstrapSwitch("state", true);
+                $("[name='border_checkbox']").filter(checkBorderFalseValue).bootstrapSwitch("state", false);
+            }, time);
+        }
+
+        setTimeout(() => {
+            $("[name='round_checkbox']").bootstrapSwitch('state',false);
+
+            $("[name='round_checkbox']")
+                .bootstrapSwitch({
+
+                    onSwitchChange: function (event, state) {
+                        //if (state == true) {
+                        //    alert('已打开');
+                        //} else {
+                        //    alert('已关闭');
+                        //}
+                        alert(1);
+                    }
+            });
+
+
             $("[name='round_checkbox']").filter(checkRoundFalseValue).bootstrapSwitch("state", false);
             $("[name='border_checkbox']").filter(checkBorderTrueValue).bootstrapSwitch("state", true);
             $("[name='border_checkbox']").filter(checkBorderFalseValue).bootstrapSwitch("state", false);
         }, 100);
+
+
+
+        $table.bootstrapTable({
+            url: '/Operation/FetchScenes',
+            toolbar: '#toolbar',
+            clickEdit: false,
+            striped: true,
+            //showToggle: true,
+            pagination: true,       //显示分页条
+            //showColumns: true,
+            //showPaginationSwitch: true,     //显示切换分页按钮
+            //showRefresh: true,      //显示刷新按钮
+            clickToSelect: true,  //点击row选中radio或CheckBox
+            showToggle: false, //是否显示详细视图和列表视图的切换按钮
+            cardView: false, //是否显示详细视图
+            detailView: false, //是否显示父子表
+            uniqueId: 'sceneId',
+            columns: [
+                {
+                    checkbox: true
+                },
+                {
+                    field: 'sceneId',
+                    visible: false
+                },
+                {
+                    field: 'funcCode',
+                    title: '应用节点',
+                    edit: false
+                },
+                {
+                    field: 'mergeName',
+                    title: '场景名称'
+                },
+                {
+                    field: 'integrateId',
+                    title: '模型集成ID',
+                    class: 'editable'
+                },
+                {
+                    field: 'mergeMemo',
+                    title: '场景说明'
+                },
+                {
+                    field: 'backPic',
+                    title: '背景天空盒'
+                },
+                {
+                    field: 'showSet',
+                    title: '默认效果设置'
+                },
+                {
+                    field: 'borderLine',
+                    title: '显示轮廓线',
+                    formatter: borderFormatter
+                },
+                {
+                    field: 'showSun',
+                    title: '启用环境光照',
+                    formatter: roundFormatter
+                },
+                {
+                    field: 'camera',
+                    title: '默认相机位'
+                },
+                {
+                    field: 'defApi',
+                    title: 'API接口'
+                },
+                //{
+                //    field: 'mergeTime',
+                //    title: '集成时间',
+                //    width: '150px',
+                //    formatter: function (value, row, index) {
+                //        return changeDateFormat(value)
+                //    }
+                //},
+                {
+                    title: '操作',
+                    formatter: buttonFormatter
+                }
+            ],
+
+            onClickCell: function (field, value, row, $element) {
+                if (field === "BorderLine" || field ==="ShowSun") {
+                    return;
+                }
+                $element.attr('contenteditable', true);
+                $element.blur(function () {
+                    let index = $element.parent().data('index');
+                    let tdValue = $element.html();
+                    saveData(index, field, tdValue);
+                    delayRender(50);
+                })
+            }
+        });
     });
 
 
