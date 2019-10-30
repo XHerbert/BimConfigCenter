@@ -1,0 +1,6 @@
+layer/*
+App_Data/
+bin/*
+obj/*
+/Web.*
+Properties/*
