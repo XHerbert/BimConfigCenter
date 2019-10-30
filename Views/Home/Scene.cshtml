@@ -1,0 +1,222 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<div class="table-box" style="margin: 20px;">
+    <div id="toolbar">
+        <button id="button" class="btn btn-default">创建场景</button>
+        <button id="getTableData" class="btn btn-default">获取数据</button>
+    </div>
+    <table id="table"></table>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.css">
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/bootstrap-switch.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.15.3/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+<script type="text/javascript">
+    let scenes = @Html.Raw(ViewBag.Scene);
+    $(function () {
+        let $table = $('#table');
+        let $button = $('#button');
+        let $getTableData = $('#getTableData');
+
+        $button.click(function () {
+            $table.bootstrapTable('insertRow', {
+                index: 10,
+                row: {
+                    id: '',
+                    name: '',
+                    price: ''
+                }
+            });
+        });
+
+        $table.bootstrapTable({
+            url: '/Operation/FetchScenes',
+            toolbar: '#toolbar',
+            clickEdit: false,
+            //showToggle: true,
+            pagination: true,       //显示分页条
+            //showColumns: true,
+            //showPaginationSwitch: true,     //显示切换分页按钮
+            //showRefresh: true,      //显示刷新按钮
+            clickToSelect: true,  //点击row选中radio或CheckBox
+            columns: [
+                {
+                    checkbox: true
+                },
+                {
+                    field: 'Id',
+                    visible: false
+                },
+                {
+                    field: 'FunctionCode',
+                    title: '应用节点',
+                    edit: false
+                },
+                {
+                    field: 'MergeName',
+                    title: '场景名称'
+                },
+                {
+                    field: 'IntegrateId',
+                    title: '模型集成ID'
+                },
+                {
+                    field: 'MergeMemo',
+                    title: '场景说明'
+                },
+                {
+                    field: 'BackPicture',
+                    title: '背景天空盒'
+                },
+                {
+                    field: 'ShowSet',
+                    title: '默认效果设置'
+                },
+                {
+                    field: 'BorderLine',
+                    title: '显示轮廓线',
+                    formatter: borderFormatter
+                },
+                {
+                    field: 'ShowSun',
+                    title: '启用环境光照',
+                    formatter: roundFormatter
+                },
+                {
+                    field: 'Camera',
+                    title: '默认相机位'
+                },
+                {
+                    field: 'DefineAPI',
+                    title: 'API接口'
+                },
+                {
+                    field: 'MergeTime',
+                    title: '集成时间',
+                    width: '150px',
+                    formatter: function (value, row, index) {
+                        return changeDateFormat(value)
+                    }
+                },
+                {
+                    title: '操作',
+                    formatter: buttonFormatter
+                }
+            ],
+
+            onClickCell: function (field, value, row, $element) {
+                //$element.attr('contenteditable', true);
+                //$element.blur(function () {
+                //    let index = $element.parent().data('index');
+                //    let tdValue = $element.html();
+
+                //    saveData(index, field, tdValue);
+                //})
+            }
+        });
+
+        $getTableData.click(function () {
+            alert(JSON.stringify($table.bootstrapTable('getData')));
+        });
+
+        function saveData(index, field, value) {
+            $table.bootstrapTable('updateCell', {
+                index: index,       //行索引
+                field: field,       //列名
+                value: value        //cell值
+            })
+        }
+
+        function roundFormatter(value, row, index) {
+            //console.log(value, row, index);
+            let __value = row['BorderLine'];
+            let __content = '';
+            if (__value) {
+                __content = '<input type="checkbox" data-on-text="启用" data-off-text="禁用" data-on-color="success" name="border_checkbox" checked>';
+            } else {
+                __content = '<input type="checkbox" data-on-text="启用" data-off-text="禁用" data-on-color="success" name="border_checkbox">';
+            }
+            return [__content];
+        }
+
+        function borderFormatter(value, row, index) {
+            //console.log(value, row, index);
+            let __value = row['ShowSun'];
+            let __content = '';
+            if (__value) {
+                __content = '<input type="checkbox" data-on-text="显示" data-off-text="隐藏" name="round_checkbox" checked>';
+            } else {
+                __content = '<input type="checkbox" data-on-text="显示" data-off-text="隐藏" name="round_checkbox">';
+            }
+            return [__content];
+        }
+
+        function buttonFormatter(value, row, index) {
+            let __txt = '修改';
+            let __style = 'btn-warning';
+            let __isNew = row['Id'];
+            if (!__isNew) {
+                __style = 'btn-success';
+                __txt = '保存';
+            }
+            return ['<button onclick = "alert('+row['Id']+')" class="btn ' + __style + ' btn-small">' + __txt + '</button>']
+        }
+
+        function dropFormat() {
+            let content = '<select id="select">';
+            for (let i = 0; i < scenes.length; i++) {
+                content += '<option value="value">' + scenes[i] + '</option>';
+            }
+            content += '</select>';
+            return [content].join("")
+        }
+
+        function changeDateFormat(cellval) {
+            var dateVal = cellval + "";
+            if (cellval != null) {
+                var date = new Date(parseInt(dateVal.replace("/Date(", "").replace(")/", ""), 10));
+                var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+                var currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+
+                var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+                var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+                var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+
+                return date.getFullYear() + "-" + month + "-" + currentDate + " " + hours + ":" + minutes + ":" + seconds;
+            }
+        }
+
+        function checkBorderTrueValue(val) {
+            return $("[name='border_checkbox']")[val].checked;
+        }
+
+        function checkBorderFalseValue(val) {
+            return !$("[name='border_checkbox']")[val].checked;
+        }
+
+        function checkRoundTrueValue(val) {
+            return $("[name='round_checkbox']")[val].checked;
+        }
+
+        function checkRoundFalseValue(val) {
+            return !$("[name='round_checkbox']")[val].checked;
+        }
+
+        //延时渲染
+        setTimeout(() =>
+        {
+            $("[name='round_checkbox']").filter(checkRoundTrueValue).bootstrapSwitch("state", true);
+            $("[name='round_checkbox']").filter(checkRoundFalseValue).bootstrapSwitch("state", false);
+            $("[name='border_checkbox']").filter(checkBorderTrueValue).bootstrapSwitch("state", true);
+            $("[name='border_checkbox']").filter(checkBorderFalseValue).bootstrapSwitch("state", false);
+        }, 100);
+    });
+
+
+</script>
+

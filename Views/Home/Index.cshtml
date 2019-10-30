@@ -1,0 +1,219 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    div {
+        border: solid 0px red;
+    }
+</style>
+
+<div class="row-fluid">
+    <div class="col-md-6">
+        <div class="form-group ">
+            <label class="control-label" for="" title="SYS_CODE">当前项目：国贸3A</label>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="row form-group ">
+            <label class="col-md-3 control-label" for="" title="">复制项目配置：</label>
+            <div class="col-md-9">
+                <select id="disabledSelect" class="form-control">
+                    <option>- 请选择 -</option>
+                    <option>国贸3A</option>
+                </select>
+                <button class="btn btn-success">复制</button>
+            </div>
+        </div>
+    </div>
+    <hr />
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="col-md-6"><ul id="ztree1" class="ztree"></ul></div>
+        <div class="col-md-6"><ul id="ztree2" class="ztree"></ul></div>
+    </div>
+    <div class="col-md-6">
+        <form class="form-horizontal center-block" role="form">
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="SYS_CODE">系统编码</label>
+                <div class="col-md-9 ">
+                    <input class="form-control" id="" type="text" placeholder="请输入系统编码(SYS_CODE)" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="SYS_NAME">系统名称</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="" type="text" placeholder="请输入系统名称(SYS_NAME)" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="SYS_ICON">系统图标</label>
+                <div class="col-md-9">
+                    <select id="disabledSelect" class="form-control">
+                        <option>- 请选择 -</option>
+                        <option>HVAC</option>
+                        <option>electricTrans</option>
+                        <option>elevator</option>
+                        <option>monitor</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="SYS_ORDER">系统排序</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="" type="number" placeholder="请输入顺序(SYS_ORDER)" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="PARENT_CODE">父级节点</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="" type="text" placeholder="父级节点(PARENT_CODE)" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="IS_SHOW">是否显示</label>
+                <div class="col-md-9">
+                    <input type="checkbox" name="my-checkbox" checked>
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="API">API</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="" type="text" placeholder="二级接口地址" />
+                </div>
+            </div>
+
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="IOT_API">IOT数据接口</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="" type="text" placeholder="请输入IOT数据接口地址" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="UI_STYLE">UI样式</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="" type="text" placeholder="请输入UI样式" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="IOT_MODEL_CODE">IOT模型编码</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="" type="text" placeholder="请输入IOT模型编码，如EAF" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="SYS_PIC">系统展示图片</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="" type="file" placeholder="上传系统展示图片" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="MODEL_STYLE">启用3DMarker</label>
+                <div class="col-md-9 text-left">
+                    <input type="checkbox" name="my-checkbox" value="0" checked="checked">
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="MODEL_SHOW_CONDITION">构件筛选条件</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="" type="text" placeholder='如[{"levelName":"F07"}]' />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="SYS_COLOR">系统颜色</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="" type="color" placeholder="报警数据统计颜色,如#05A3FF" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for=""></label>
+                <div class="col-md-9">
+                    <input class="btn btn-success" id="" type="submit" value="保存" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/bootstrap-switch.min.js"></script>
+<link href="~/Content/zTreeStyle.css" rel="stylesheet" />
+<script src="~/Scripts/jquery.ztree.all.min.js"></script>
+<script type="text/javascript">
+    $("[name='my-checkbox']").bootstrapSwitch();
+</script>
+
+<script type="text/javascript">
+    $(function () {
+
+        //创建ztree的配置对象
+        var setting1 = {
+            treeId: "ztree1",
+            data: {
+                simpleData: {
+                    enable: true, //设置使用简单数据格式
+                    idKey: "id",//id标识  可以修改为数据库对应字段
+                    pIdKey: "pId",//父级id
+                    rootPId: 0,//根节点id
+                }
+            },
+            view: {
+                showIcon: false,
+                showLine: false,
+                fontCss: { 'color': '#333', 'font-family': '微软雅黑', 'font-size': '14px' }
+            },
+            check: {
+                enable: true
+            },
+            //设置点击事件
+            callback: {
+                onClick: function (event, treeId, treeNode, clickFlag) {
+                    console.log(treeNode.name)
+                }
+            }
+        }
+
+        //树节点数据
+        var zNodes1 = [{
+            "id": 1,
+            "pId": 0,
+            "name": "暖通空调"
+        },
+        {
+            "id": 101,
+            "pId": 1,
+            "name": "送风系统"
+        },
+        {
+            "id": 102,
+            "pId": 1,
+            "name": "排风系统"
+        },
+        {
+            "id": 2,
+            "pId": 0,
+            "name": "变配电"
+        },
+        {
+            "id": 201,
+            "pId": 2,
+            "name": "变电箱"
+        },
+        {
+            "id": 202,
+            "pId": 1,
+            "name": "新风系统"
+        },
+        {
+            "id": 3,
+            "pId": 0,
+            "name": "给排水"
+        },
+        ];
+
+        //初始化第一个树
+        $.fn.zTree.init($("#ztree1"), setting1, zNodes1);
+        $.fn.zTree.init($("#ztree2"), setting1, zNodes1);
+    });
+</script>

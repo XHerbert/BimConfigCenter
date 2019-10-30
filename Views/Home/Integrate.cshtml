@@ -1,0 +1,111 @@
+﻿@{
+    ViewBag.Title = "集成模型";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<SelectListItem> projects = ViewBag.SelectItems as List<SelectListItem>;
+    List<SelectListItem> floors = ViewBag.floors as List<SelectListItem>;
+    List<SelectListItem> specialty = ViewBag.specialty as List<SelectListItem>;
+}
+<div class="row">
+    <div class="main-content">
+        <div class="border-box">
+            <div class="sider-box">
+                <div class="inte-filter">
+                    <div class="div-search">
+                        <span style="color: rgb(102, 102, 102);">项目：</span>
+                        <div class="bee-input">
+                            <span class="bee-input-label"></span>
+                            @Html.DropDownList("proj", projects, new { @class = "bee-input-input bee-input-medium" })
+                        </div>
+                        <button class="bee-button bee-button-plain bee-button-medium" style="margin-left: 7px;  vertical-align: bottom;">
+                            <span class="bee-button-value" id="query">查询</span>
+                        </button>
+                        <p style="margin-top:10px;"><span style="color: rgb(102, 102, 102);">文件：</span><input type="checkbox" name="loadChangeFile" data-size="mini" data-on-text="显示变更文件" data-off-text="显示所有文件" data-on-color="danger" data-off-color="success" /></p>
+                    </div>
+                </div>
+                <div class="list-box">
+                    <ul id="models"></ul>
+                    <div class="div-table-is-empty" style="display: none;">
+                        <div>
+                            <div class="img-empty-icon empty_intergrate_list"></div>
+                            <div class="div-tip">暂无完成转换的rvt文件</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="integrate-content">
+                <div class="add-file">
+                    <span style="color: rgb(102, 102, 102); font-size: 14px;">模型集成配置为按需加载：</span>
+                    <div class="bee-input">
+                        <span class="bee-input-label"></span>
+                        @Html.DropDownList("config", new List<SelectListItem> { new SelectListItem { Text = "全部加载", Value = "0", Selected = true }, new SelectListItem { Text = "按需加载", Value = "1" } }, new { @class = "bee-input-input bee-input-medium" })                                                
+                        <button id="queryHistory" class="bee-button bee-button-plain bee-button-medium" style="margin-right: 5px; vertical-align: bottom;">
+                            <span class="bee-button-value">集成历史</span>
+                        </button>
+                        <button id="clear" class="bee-button bee-button-plain bee-button-medium" style="margin-right: 20px; vertical-align: bottom;">
+                            <span class="bee-button-value">清空列表</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="toIntegrate-list">
+                    <table cellspacing="0" cellpadding="0" class="table-list">
+                        <tr>
+                            <th class="head">源文件</th>
+                            <th width="150" class="head">
+                                专业
+                                <i class="iconfont icon-setting fixicon fixhover"></i>
+                            </th>
+                            <th width="150" class="head">
+                                楼层
+                                <i class="iconfont icon-setting fixicon fixhover"></i>
+                            </th>
+                            <th width="80" class="head">操作</th>
+                        </tr>
+                    </table>
+                    <div class="toIntegrate-table-box">
+                        <table cellspacing="0" cellpadding="0" class="table-list" id="integs">
+                            <tr id="desc">
+                                <td colspan="4" class="error">
+                                    <span class="table-tips">
+                                        多个[RVT]文件，可以集成为一个全专业、楼层的模型，您需要好几步操作：<br>
+                                        1、从左侧筛选框中选择【项目】，点击【查询】按钮，可列出该项目下所有的模型文件<br>
+                                        2、针对每个文件，设置其对应的【专业】、【楼层】（专业和楼层的名称请自行定义）<br>
+                                        3、如果需要使用按需加载特性，将上方的下拉框置为【按需加载】<br>
+                                        4、设置完成后，输入集成模型的名称，即可开始集成
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="add-name">
+                        <div class="bee-input" style="line-height: 35px; margin-right: 10px;">
+                            <input type="checkbox" name="ss" data-size="small" data-on-text="启用SS渲染" data-off-text="关闭SS渲染" data-on-color="success" data-off-color="danger" checked="checked" class="bee-input-input bee-input-medium" style="width: 357px; height: 35px;margin-right:10px;"/>
+                            <span class="bee-input-label"></span>
+                            <input type="text" id="integrate" placeholder="请输入集成模型的名称" class="bee-input-input bee-input-medium" style="width: 357px; height: 35px;">
+                        </div>
+                        <button id="beginbtn" class="bee-button bee-button-primary bee-button-large bee-button-disabled">开始集成</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="bee-modal-mask" style="display:none"></div>
+<div class="bee-modal-wrapper" style="display:none" id="his">
+    <div class="bee-modal-header"><div class="box-header"><span class="header-title">历史记录</span> <span class="header-icon"><span onclick="document.getElementById('his').style.display = 'none';$('div.bee-modal-mask').css('display', 'none');" class="iconfont icon-close-" style="cursor:pointer;font-size: 12px; float: right; color: rgb(102, 102, 102);"></span></span></div></div> <div class="bee-modal-body">
+        <div class="setting-content" style="max-height: 877px;">
+            <ul class="options"></ul>
+        </div>
+    </div> <div class="bee-modal-footer"></div>
+</div>
+<link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/develop.css")">
+<script type="text/javascript" src="@Url.Content("~/Scripts/jquery-3.3.1.min.js")"></script>
+<script src="~/Scripts/bootstrap-switch.min.js"></script>
+<script type="text/javascript" src="@Url.Content("~/layer/layer.js")"></script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/app.js")"></script>
+<script type="text/javascript">
+    $("[name='ss']").bootstrapSwitch();
+    $("[name='loadChangeFile']").bootstrapSwitch();
+    
+</script>
