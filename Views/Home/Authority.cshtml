@@ -69,8 +69,8 @@
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="" title=""></label>
                 <div class="col-md-9">
-                    <button class="btn btn-success " id="submit">保存</button>
-                    <button class="btn btn-danger  " id="submit">重置</button>
+                    <button class="btn btn-success" id="submit">保存</button>
+                    <button class="btn btn-danger" id="reset">重置</button>
                 </div>
             </div>
         </div>
@@ -89,7 +89,9 @@
 <script src="~/datepicker/locales/bootstrapValidator.zh_CN.js"></script>
 
 <script type="text/javascript">
-    var host = 'http://10.1.73.50:8079/api/appkey/';
+    let host = 'http://10.1.73.50:8079/api/appkey/';
+
+    // 提交表单
     $('#submit').bind('click', () => {
         let bootstrapValidator = $("form").data('bootstrapValidator');
         bootstrapValidator.validate();
@@ -119,10 +121,15 @@
         } else {
             return;
         }
-
-
     });
 
+    // 重置表单
+    $('#reset').bind('click', () => {
+        $("form").data('bootstrapValidator').resetForm();
+        $('input').val('');
+    })
+
+    // 日期控件渲染
     $(".input-group.date").datepicker({
         language: 'zh-CN',
         orientation: "bottom",
@@ -130,6 +137,7 @@
         todayHighlight: true,
     });
 
+    // 表单验证
     $(function () {
         $('form').bootstrapValidator({
             message: 'This value is not valid',
