@@ -1,5 +1,6 @@
 ﻿@{
     ViewBag.Title = "授权信息";
+    List<SelectListItem> projects = ViewBag.SelectItems as List<SelectListItem>;
 }
 
 <style type="text/css">
@@ -15,45 +16,195 @@
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="" title="APP_NAME">应用名称</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="请输入应用名称" />
+                    <input class="form-control" id="" name="appName" type="text" placeholder="请输入应用名称" required />
                 </div>
             </div>
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="" title="APP_KEY">AppKey</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="请输入AppKey" />
+                    <input class="form-control" id="" name="appKey" type="text" placeholder="请输入AppKey" required />
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="APP_SECRET">AppSecret</label>
+                <label class="col-md-3 control-label" for="appSecret" title="APP_SECRET">AppSecret</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="请输入AppSecret" />
+                    <input class="form-control" id="" type="password" name="appSecret" placeholder="请输入AppSecret" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="" title="APP_COMPANY">关联项目</label>
+                <div class="col-md-9">
+                    @Html.DropDownList("projectId", projects, new { @class = "form-control" })
                 </div>
             </div>
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="" title="APP_COMPANY">申请单位</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="请输入申请单位" />
+                    <input class="form-control" id="" type="text" name="appCompany" placeholder="请输入申请单位" />
                 </div>
             </div>
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="" title="APP_USER">申请人</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="请输入申请人" />
+                    <input class="form-control" id="" type="text" name="appUser" placeholder="请输入申请人" />
                 </div>
             </div>
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="" title="APP_TEL">联系方式</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="tel" placeholder="请输入联系方式" />
+                    <input class="form-control" id="" type="tel" name="appTel" placeholder="请输入联系方式" />
+                </div>
+            </div>
+            <div class="form-inline form-group">
+                <label class="col-md-3 control-label" for="" title="APP_Time">申请时间</label>
+                <div class="col-md-9">
+                    <div class="input-group date" data-date-format="yyyy-mm-dd">
+                        <input type="text" name="appTime" class="form-control" />
+                        <span class="input-group-addon">
+                            <i class="glyphicon glyphicon-th"></i>
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="API"></label>
+                <label class="col-md-3 control-label" for="" title=""></label>
                 <div class="col-md-9">
-                    <button class="btn btn-success">保存</button>
+                    <button class="btn btn-success " id="submit">保存</button>
+                    <button class="btn btn-danger  " id="submit">重置</button>
                 </div>
             </div>
         </div>
     </form>
 </div>
+
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<link href="~/datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<script src="~/datepicker/js/bootstrap-datepicker.min.js"></script>
+<script src="~/layer/layer.js"></script>
+<script src="~/datepicker/locales/bootstrap-datepicker.zh-CN.min.js"></script>
+<link href="~/Content/bootstrapValidator.min.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrapValidator.min.js"></script>
+<script src="~/datepicker/locales/bootstrapValidator.zh_CN.js"></script>
+
+<script type="text/javascript">
+    var host = 'http://10.1.73.50:8079/api/appkey/';
+    $('#submit').bind('click', () => {
+        let bootstrapValidator = $("form").data('bootstrapValidator');
+        bootstrapValidator.validate();
+        if (bootstrapValidator.isValid()) {
+            let data = {};
+            let t = $('form').serializeArray();
+            $.each(t, function () {
+                data[this.name] = this.value;
+            });
+            console.log(JSON.stringify(data));
+
+            let options = {
+                url: host + "createAppKey",
+                data: JSON.stringify(data),
+                type: 'POST',
+                contentType: 'application/json',
+                success: (response) => {
+                    if (response.code === 20000) {
+                        layer.msg("授权信息创建成功！");
+                    } else {
+                        layer.msg(response.message);
+                    }
+                }
+            };
+
+            $.ajax(options);
+        } else {
+            return;
+        }
+
+
+    });
+
+    $(".input-group.date").datepicker({
+        language: 'zh-CN',
+        orientation: "bottom",
+        autoclose: true,
+        todayHighlight: true,
+    });
+
+    $(function () {
+        $('form').bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                appName: {
+                    message: '应用名称验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '应用名称不能为空'
+                        }
+                    }
+                },
+                appKey: {
+                    validators: {
+                        notEmpty: {
+                            message: 'AppKey不能为空'
+                        }
+                    }
+                },
+                appSecret: {
+                    validators: {
+                        notEmpty: {
+                            message: 'AppSecret不能为空'
+                        }
+                    }
+                },
+                project: {
+                    validators: {
+                        notEmpty: {
+                            message: '请选择关联项目'
+                        },
+                        callback: {
+                            message: '请选择关联项目',
+                            callback: function (value, validator) {
+                                if (value == -1) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+
+                            }
+                        }
+                    }
+                },
+                appCompany: {
+                    validators: {
+                        notEmpty: {
+                            message: '申请单位不能为空'
+                        }
+                    }
+                },
+                appUser: {
+                    validators: {
+                        notEmpty: {
+                            message: '申请人不能为空'
+                        }
+                    }
+                },
+                appTel: {
+                    validators: {
+                        notEmpty: {
+                            message: '联系方式不能为空'
+                        },
+                        regexp: {
+                            regexp: /^1\d{10}$/,
+                            message: '手机号格式错误'
+                        }
+                    }
+                },
+            }
+        });
+    });
+</script>

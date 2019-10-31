@@ -68,8 +68,22 @@ namespace ConfigCenterApp.Controllers
 
         public ActionResult Authority()
         {
-           
-
+            using (var db = new IntegrateDbContext())
+            {
+                var projectListItems = new List<SelectListItem>();
+                var projectListSql = string.Format(StaticSql.PROJECT_LIST);
+                var projectList = db.Database.SqlQuery<Project>(projectListSql);
+                List<Project> projects = projectList.ToList();
+                projects.ForEach(item =>
+                {
+                    SelectListItem projectItem = new SelectListItem();
+                    projectItem.Text = item.Name;
+                    projectItem.Value = item.Id.ToString();
+                    projectListItems.Add(projectItem);
+                });
+                projectListItems.Insert(0, new SelectListItem { Text = "请选择项目", Value = "-1", Selected = true });
+                ViewBag.SelectItems = projectListItems;
+            }
             return View();
         }
 
