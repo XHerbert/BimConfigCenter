@@ -1,6 +1,5 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
-
 }
 
 <div class="table-box" style="margin: 20px;">
@@ -18,13 +17,13 @@
 <script src="https://unpkg.com/bootstrap-table@1.15.3/dist/locale/bootstrap-table-zh-CN.min.js"></script>
 <script src="~/layer/layer.js"></script>
 <script type="text/javascript">
-    let scenes = @Html.Raw(ViewBag.Scene);
+
     let host = 'http://10.1.73.50:8079/api/scene';
     $(function () {
         let $table = $('#table');
         let $button = $('#button');
         let $getTableData = $('#getTableData');
-
+        // 新增一行
         $button.click(function () {
             $table.bootstrapTable('insertRow', {
                 index: 10,
@@ -37,62 +36,63 @@
                     ShowSet: '',
                     BorderLine: true,
                     ShowSun: false,
-                    Camera:'',
+                    Camera: '',
                     DefineAPI: '',
-                    MergeTime:''
-                },
-                contenteditable:true
+                    MergeTime: ''
+                }
             });
-            delayRender(10);
+            $.fn.delayRender(10);
         });
 
         $getTableData.click(function () {
-            alert(JSON.stringify($table.bootstrapTable('getData')));
+            console.log($table.bootstrapTable('getData'));
         });
 
-        function saveData(index, field, value) {
+        // 存储表格变更数据
+        $.fn.saveData = (index, field, value) => {
             $table.bootstrapTable('updateCell', {
                 index: index,       //行索引
                 field: field,       //列名
                 value: value        //cell值
-            })
+            });
         }
 
-        function borderFormatter(value, row, index) {
+        $.fn.borderFormatter = (value, row, index) => {
             let __value = row['borderLine'];
             let __content = '';
             if (__value) {
-                __content = '<input type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="border_checkbox" checked>';
+                __content = '<input class="_switch_" id="border' + row['sceneId'] + '"  data-type = "border"  data-scene-id = ' + row['sceneId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="border_checkbox" checked>';
             } else {
-                __content = '<input type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="border_checkbox">';
+                __content = '<input class="_switch_" id="border' + row['sceneId'] + '"  data-type = "border" data-scene-id = ' + row['sceneId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="border_checkbox">';
             }
             return [__content];
         }
 
-        function roundFormatter(value, row, index) {
+        $.fn.roundFormatter = (value, row, index) => {
             let __value = row['showSun'];
             let __content = '';
             if (__value) {
-                __content = '<input type="checkbox" data-on-text="启用" data-off-text="禁用" data-on-color="success" data-off-color="danger" name="border_checkbox" checked>';
+                __content = '<input class="_switch_" id="round' + row['sceneId'] + '"  data-type = "round" data-scene-id = ' + row['sceneId'] + ' type="checkbox" data-on-text="启用" data-off-text="禁用" data-on-color="success" data-off-color="danger" name="border_checkbox" checked>';
             } else {
-                __content = '<input type="checkbox" data-on-text="启用" data-off-text="禁用" data-on-color="success" data-off-color="danger" name="border_checkbox">';
+                __content = '<input class="_switch_" id="round' + row['sceneId'] + '"  data-type = "round" data-scene-id = ' + row['sceneId'] + ' type="checkbox" data-on-text="启用" data-off-text="禁用" data-on-color="success" data-off-color="danger" name="border_checkbox">';
             }
             return [__content];
         }
 
+        // 修改场景配置
         $.fn.updateRowData = (id) => {
             let __row = $table.bootstrapTable('getRowByUniqueId', id);
             // 数据转换
             __row['borderLine'] == true ? __row['borderLine'] = 1 : __row['borderLine'] = 0;
-            __row['showSun']  == true ? __row['showSun'] = 1 : __row['showSun'] = 0;
+            __row['showSun'] == true ? __row['showSun'] = 1 : __row['showSun'] = 0;
             let options = {
                 url: host + "/updateScene",
                 data: JSON.stringify(__row),
                 type: 'PUT',
-                contentType:'application/json',
+                contentType: 'application/json',
                 success: (response) => {
                     if (response.code === 20000) {
-                        layer.msg("场景[" + __row['mergeName']+"]更新成功！");
+                        layer.msg("场景[" + __row['mergeName'] + "]更新成功！");
                     } else {
                         layer.msg(response.message);
                     }
@@ -102,15 +102,19 @@
             $.ajax(options);
         }
 
-        $.fn.createRowData = (row_data) => {
+        // 创建场景配置
+        $.fn.createRowData = () => {
+            let __count = $table.bootstrapTable('getData').length;
+            let row_data = JSON.stringify($table.bootstrapTable('getData')[__count - 1]);
+            console.log(row_data);
             let options = {
-                url: host+"createScene",
-                data: JSON.stringify(row_data),
+                url: host + "createScene",
+                data: row_data,
                 type: 'POST',
                 contentType: 'application/json',
                 success: (response) => {
                     if (response.code === 20000) {
-                        layer.msg("场景创建成功！");
+                        layer.msg("场景[" + row_data['mergeName'] + "]创建成功！");
                     } else {
                         layer.msg(response.message);
                     }
@@ -119,29 +123,27 @@
             $.ajax(options);
         }
 
-        function buttonFormatter(value, row, index) {
+        // 按钮样式
+        $.fn.buttonFormatter = (value, row, index) => {
+            let __data = { rowdata: row };
+            let __content = '';
             let __txt = '修改';
             let __style = 'btn-warning';
-            let __isNew = row['sceneId'];
-            if (!__isNew) {
+            let __isEdit = row['sceneId'];
+            if (!__isEdit) {
                 __style = 'btn-success';
                 __txt = '保存';
+                __content = '<button onclick = "$.fn.createRowData()" class="btn ' + __style + ' btn-small">' + __txt + '</button>';
+                console.error(__data);
+            } else {
+                __content = '<button onclick = "$.fn.updateRowData(' + row['sceneId'] + ')" class="btn ' + __style + ' btn-small">' + __txt + '</button>';
             }
-            return ['<button onclick = "$.fn.updateRowData(' + row['sceneId']+')" class="btn ' + __style + ' btn-small">' + __txt + '</button>']
+            return [__content];
         }
 
-        function dropFormat() {
-            let content = '<select id="select">';
-            for (let i = 0; i < scenes.length; i++) {
-                content += '<option value="value">' + scenes[i] + '</option>';
-            }
-            content += '</select>';
-            return [content].join("")
-        }
-
-        function changeDateFormat(cellval) {
+        $.fn.changeDateFormat = (cellval) => {
             var dateVal = cellval + "";
-            if (cellval != null && cellval!='') {
+            if (cellval != null && cellval != '') {
                 var date = new Date(parseInt(dateVal.replace("/Date(", "").replace(")/", ""), 10));
                 var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
                 var currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
@@ -154,56 +156,77 @@
             }
         }
 
-        function checkBorderTrueValue(val) {
+        $.fn.checkBorderTrueValue = (val) => {
             return $("[name='border_checkbox']")[val].checked;
         }
 
-        function checkBorderFalseValue(val) {
+        $.fn.checkBorderFalseValue = (val) => {
             return !$("[name='border_checkbox']")[val].checked;
         }
 
-        function checkRoundTrueValue(val) {
+        $.fn.checkRoundTrueValue = (val) => {
             return $("[name='round_checkbox']")[val].checked;
         }
 
-        function checkRoundFalseValue(val) {
+        $.fn.checkRoundFalseValue = (val) => {
             return !$("[name='round_checkbox']")[val].checked;
         }
 
-        //延时渲染
-        function delayRender(time) {
+        $.fn.initSwitch = () => {
+            $("[name='round_checkbox']").filter($.fn.checkRoundTrueValue).bootstrapSwitch("state", true);
+            $("[name='round_checkbox']").filter($.fn.checkRoundFalseValue).bootstrapSwitch("state", false);
+            $("[name='border_checkbox']").filter($.fn.checkBorderTrueValue).bootstrapSwitch("state", true);
+            $("[name='border_checkbox']").filter($.fn.checkBorderFalseValue).bootstrapSwitch("state", false);
+        }
+
+        // 延时渲染
+        $.fn.delayRender = (time) => {
             setTimeout(() => {
-                $("[name='round_checkbox']").filter(checkRoundTrueValue).bootstrapSwitch("state", true);
-                $("[name='round_checkbox']").filter(checkRoundFalseValue).bootstrapSwitch("state", false);
-                $("[name='border_checkbox']").filter(checkBorderTrueValue).bootstrapSwitch("state", true);
-                $("[name='border_checkbox']").filter(checkBorderFalseValue).bootstrapSwitch("state", false);
+                $("input._switch_")
+                    .bootstrapSwitch({
+                        onSwitchChange: function (event, state) {
+                            console.log("state===", state);
+                            let __sceneId = Number(event.target.attributes['data-scene-id'].value);
+                            let __type = event.target.attributes['data-type'].value;
+                            let __state = state === true ? 1 : 0;
+                            let __data = __type === "border" ? { sceneId: __sceneId, borderLine: __state } : { sceneId: __sceneId, showSun: __state };
+
+                            let __update_data = {
+                                index: $(event.target).parent().parent().parent().parent()[0].getAttribute('data-index'), //行索引
+                                field: "",  //列名
+                                value: state  //cell值
+                            };
+                            if (__type === "border") {
+                                __update_data.field = "BorderLine";
+                                $table.bootstrapTable('updateCell', __update_data);
+                            } else {
+                                __update_data.field = "ShowSun";
+                                $table.bootstrapTable('updateCell', __update_data);
+                            }
+                            console.log("__update_data", __update_data);
+                            let options = {
+                                url: host + "/updateScene",
+                                data: JSON.stringify(__data),
+                                type: 'PUT',
+                                contentType: 'application/json',
+                                success: (response) => {
+                                    if (response.code === 20000) {
+                                        console.log("场景Id[" + __sceneId + "]的[" + __type + "]更新为[" + state + "]成功！");
+                                    } else {
+                                        layer.msg(response.message);
+                                    }
+                                }
+                            };
+
+                            $.ajax(options);
+                            $.fn.initSwitch();
+                        }
+                    });
+                $.fn.initSwitch();
             }, time);
         }
 
-        setTimeout(() => {
-            $("[name='round_checkbox']").bootstrapSwitch('state',false);
-
-            $("[name='round_checkbox']")
-                .bootstrapSwitch({
-
-                    onSwitchChange: function (event, state) {
-                        //if (state == true) {
-                        //    alert('已打开');
-                        //} else {
-                        //    alert('已关闭');
-                        //}
-                        alert(1);
-                    }
-            });
-
-
-            $("[name='round_checkbox']").filter(checkRoundFalseValue).bootstrapSwitch("state", false);
-            $("[name='border_checkbox']").filter(checkBorderTrueValue).bootstrapSwitch("state", true);
-            $("[name='border_checkbox']").filter(checkBorderFalseValue).bootstrapSwitch("state", false);
-        }, 100);
-
-
-
+        // 初始化表格
         $table.bootstrapTable({
             url: '/Operation/FetchScenes',
             toolbar: '#toolbar',
@@ -256,12 +279,12 @@
                 {
                     field: 'borderLine',
                     title: '显示轮廓线',
-                    formatter: borderFormatter
+                    formatter: $.fn.borderFormatter
                 },
                 {
                     field: 'showSun',
                     title: '启用环境光照',
-                    formatter: roundFormatter
+                    formatter: $.fn.roundFormatter
                 },
                 {
                     field: 'camera',
@@ -281,25 +304,26 @@
                 //},
                 {
                     title: '操作',
-                    formatter: buttonFormatter
+                    formatter: $.fn.buttonFormatter
                 }
             ],
 
-            onClickCell: function (field, value, row, $element) {
-                if (field === "BorderLine" || field ==="ShowSun") {
+            onClickCell: (field, value, row, $element) => {
+                if (field === "borderLine" || field === "showSun") {
                     return;
                 }
                 $element.attr('contenteditable', true);
                 $element.blur(function () {
                     let index = $element.parent().data('index');
                     let tdValue = $element.html();
-                    saveData(index, field, tdValue);
-                    delayRender(50);
+                    $.fn.saveData(index, field, tdValue);
+                    $.fn.delayRender(1);
                 })
             }
         });
+
+
+        $.fn.delayRender(50);
     });
-
-
 </script>
 
