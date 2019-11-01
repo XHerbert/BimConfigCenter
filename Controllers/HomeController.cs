@@ -89,9 +89,27 @@ namespace ConfigCenterApp.Controllers
 
         public ActionResult Scene()
         {
-            //TODO:
-            List<string> sceneList = new List<string> { "设备管理", "报警管理" };
-            ViewBag.Scene = JsonConvert.SerializeObject(sceneList);
+            using (var db = new IntegrateDbContext())
+            {
+                var projectListItems = new List<SelectListItem>();
+                var projectListSql = string.Format(StaticSql.PROJECT_LIST);
+                var projectList = db.Database.SqlQuery<Project>(projectListSql);
+                List<Project> projects = projectList.ToList();
+                IDictionary<int, string> projectDictionary = new Dictionary<int, string>();
+                //projectDictionary.Add(-1, "- 请选择项目 -");
+                projects.ForEach(item =>
+                {
+                    SelectListItem projectItem = new SelectListItem();
+                    projectItem.Text = item.Name;
+                    projectItem.Value = item.Id.ToString();
+                    projectListItems.Add(projectItem);
+
+                    projectDictionary.Add(item.Id, item.Name );
+                });
+                projectListItems.Insert(0, new SelectListItem { Text = "请选择项目", Value = "-1", Selected = true });
+                ViewBag.SelectItems = projectListItems;
+                ViewBag.Projects = JsonConvert.SerializeObject(projects);
+            }
             return View();
         }
     }

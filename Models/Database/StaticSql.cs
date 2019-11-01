@@ -34,7 +34,7 @@ namespace IntegrateWebApp.Models.Database
         /// </summary>
         public static string SCENES = @"SELECT SCENE_ID sceneId,`PROJECT_ID` projectId,`MERGE_NAME` mergeName,`MERGE_MEMO` mergeMemo,
                                         `FUNC_CODE` funcCode,`INTEGRATE_ID` integrateId,`MERGER` merger,
-                                        `BACK_PIC` backPic,`SHOW_SET` showSet,`BORDER_LINE` borderLine,`SHOW_SUN` showSun,`CAMERA` camera,`DEF_API` defApi FROM `gfm_bim_appinfo` WHERE `PROJECT_ID`={0} ";
+                                        `BACK_PIC` backPic,`SHOW_SET` showSet,`BORDER_LINE` borderLine,`SHOW_SUN` showSun,`CAMERA` camera,`DEF_API` defApi FROM `gfm_bim_appinfo` ";
 
     }
 }

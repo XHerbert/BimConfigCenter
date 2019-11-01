@@ -1,5 +1,8 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    List<SelectListItem> projectId = ViewBag.SelectItems as List<SelectListItem>;
+    //List<IntegrateWebApp.Models.Entity.Project> projects = ViewBag.Projects as List<IntegrateWebApp.Models.Entity.Project>;
+    IDictionary<int, string> projects = ViewBag.Projects as Dictionary<int, string>;
 }
 
 <div class="table-box" style="margin: 20px;">
@@ -18,27 +21,30 @@
 <script src="~/layer/layer.js"></script>
 <script type="text/javascript">
 
-    let host = 'http://10.1.73.50:8079/api/scene';
+    let _project_list = @Html.Raw(ViewBag.Projects);
+    let host = 'http://10.1.73.50:8079/api/scene/';
     $(function () {
         let $table = $('#table');
         let $button = $('#button');
         let $getTableData = $('#getTableData');
+
         // 新增一行
         $button.click(function () {
             $table.bootstrapTable('insertRow', {
                 index: 10,
                 row: {
-                    FunctionCode: '',
-                    MergeName: '',
-                    IntegrateId: '',
-                    MergeMemo: '',
-                    BackPicture: '',
-                    ShowSet: '',
-                    BorderLine: true,
-                    ShowSun: false,
-                    Camera: '',
-                    DefineAPI: '',
-                    MergeTime: ''
+                    projectId: 0,
+                    funcCode: '',
+                    mergeName: '',
+                    integrateId: '',
+                    mergeMemo: '',
+                    backPic: '',
+                    showSet: '',
+                    borderLine: true,
+                    showSun: false,
+                    camera: '',
+                    defApi: '',
+                    mergeTime: ''
                 }
             });
             $.fn.delayRender(10);
@@ -86,7 +92,7 @@
             __row['borderLine'] == true ? __row['borderLine'] = 1 : __row['borderLine'] = 0;
             __row['showSun'] == true ? __row['showSun'] = 1 : __row['showSun'] = 0;
             let options = {
-                url: host + "/updateScene",
+                url: host + "updateScene",
                 data: JSON.stringify(__row),
                 type: 'PUT',
                 contentType: 'application/json',
@@ -105,16 +111,20 @@
         // 创建场景配置
         $.fn.createRowData = () => {
             let __count = $table.bootstrapTable('getData').length;
-            let row_data = JSON.stringify($table.bootstrapTable('getData')[__count - 1]);
-            console.log(row_data);
+            let row_data = $table.bootstrapTable('getData')[__count - 1];
+            row_data['borderLine'] == true ? row_data['borderLine'] = 1 : row_data['borderLine'] = 0;
+            row_data['showSun'] == true ? row_data['showSun'] = 1 : row_data['showSun'] = 0;
+            console.log($table.bootstrapTable('getData')[__count - 1]);
             let options = {
                 url: host + "createScene",
-                data: row_data,
+                data: JSON.stringify(row_data),
                 type: 'POST',
                 contentType: 'application/json',
                 success: (response) => {
                     if (response.code === 20000) {
-                        layer.msg("场景[" + row_data['mergeName'] + "]创建成功！");
+                        layer.msg("场景[" + row_data['mergeName'] + "]创建成功！", () => {
+                            window.location.reload(true);
+                        });
                     } else {
                         layer.msg(response.message);
                     }
@@ -134,13 +144,13 @@
                 __style = 'btn-success';
                 __txt = '保存';
                 __content = '<button onclick = "$.fn.createRowData()" class="btn ' + __style + ' btn-small">' + __txt + '</button>';
-                console.error(__data);
             } else {
                 __content = '<button onclick = "$.fn.updateRowData(' + row['sceneId'] + ')" class="btn ' + __style + ' btn-small">' + __txt + '</button>';
             }
             return [__content];
         }
 
+        // 日期格式化
         $.fn.changeDateFormat = (cellval) => {
             var dateVal = cellval + "";
             if (cellval != null && cellval != '') {
@@ -154,6 +164,33 @@
 
                 return date.getFullYear() + "-" + month + "-" + currentDate + " " + hours + ":" + minutes + ":" + seconds;
             }
+        }
+
+        // 下拉列表
+        $.fn.dropdownFormat = (value, row, index) => {
+            let __projects = _project_list;
+            let __item = row['projectId'];
+            let __drop = '<select onchange="$.fn.selectChange(this)" class="form-control" id="projectId" name="projectId">';
+            __drop += row['sceneId'] === undefined ? '<option selected="selected" value="-1">请选择项目</option>' : '<option value="-1">请选择项目</option>';
+
+            for (let i = 0, len = __projects.length; i < len; i++) {
+                let __current = __projects[i];
+                if (__item && __item === __current.Id) {
+                    __drop += '<option selected="selected" value="' + __current.Id + '">' + __current.Name + '</option>';
+                } else {
+                    __drop += '<option value="' + __current.Id + '">' + __current.Name + '</option>';
+                }
+            }
+            __drop += '</select>';
+            return __drop;
+        }
+
+        // 下拉列表回调
+        $.fn.selectChange = (_this) => {
+            console.log($(_this).find("option:selected").val());
+            console.log($(_this).parent().parent().data('index'));
+            $.fn.saveData($(_this).parent().parent().data('index'), 'projectId', Number($(_this).find("option:selected").val()));
+            $.fn.delayRender(10);
         }
 
         $.fn.checkBorderTrueValue = (val) => {
@@ -173,10 +210,10 @@
         }
 
         $.fn.initSwitch = () => {
-            $("[name='round_checkbox']").filter($.fn.checkRoundTrueValue).bootstrapSwitch("state", true);
-            $("[name='round_checkbox']").filter($.fn.checkRoundFalseValue).bootstrapSwitch("state", false);
-            $("[name='border_checkbox']").filter($.fn.checkBorderTrueValue).bootstrapSwitch("state", true);
-            $("[name='border_checkbox']").filter($.fn.checkBorderFalseValue).bootstrapSwitch("state", false);
+            $("[name='round_checkbox']").filter($.fn.checkRoundTrueValue).bootstrapSwitch("state", true, false);
+            $("[name='round_checkbox']").filter($.fn.checkRoundFalseValue).bootstrapSwitch("state", false, false);
+            $("[name='border_checkbox']").filter($.fn.checkBorderTrueValue).bootstrapSwitch("state", true, false);
+            $("[name='border_checkbox']").filter($.fn.checkBorderFalseValue).bootstrapSwitch("state", false, false);
         }
 
         // 延时渲染
@@ -184,6 +221,7 @@
             setTimeout(() => {
                 $("input._switch_")
                     .bootstrapSwitch({
+                        toggleState: false,
                         onSwitchChange: function (event, state) {
                             console.log("state===", state);
                             let __sceneId = Number(event.target.attributes['data-scene-id'].value);
@@ -237,7 +275,7 @@
             //showColumns: true,
             //showPaginationSwitch: true,     //显示切换分页按钮
             //showRefresh: true,      //显示刷新按钮
-            clickToSelect: true,  //点击row选中radio或CheckBox
+            clickToSelect: false,  //点击row选中radio或CheckBox
             showToggle: false, //是否显示详细视图和列表视图的切换按钮
             cardView: false, //是否显示详细视图
             detailView: false, //是否显示父子表
@@ -258,6 +296,12 @@
                 {
                     field: 'mergeName',
                     title: '场景名称'
+                },
+                {
+                    field: 'projectId',
+                    title: '所属项目',
+                    width: '250px',
+                    formatter: $.fn.dropdownFormat
                 },
                 {
                     field: 'integrateId',
@@ -294,14 +338,6 @@
                     field: 'defApi',
                     title: 'API接口'
                 },
-                //{
-                //    field: 'mergeTime',
-                //    title: '集成时间',
-                //    width: '150px',
-                //    formatter: function (value, row, index) {
-                //        return changeDateFormat(value)
-                //    }
-                //},
                 {
                     title: '操作',
                     formatter: $.fn.buttonFormatter
@@ -309,19 +345,18 @@
             ],
 
             onClickCell: (field, value, row, $element) => {
-                if (field === "borderLine" || field === "showSun") {
+                if (field === "borderLine" || field === "showSun" || field === "projectId") {
                     return;
                 }
                 $element.attr('contenteditable', true);
                 $element.blur(function () {
                     let index = $element.parent().data('index');
-                    let tdValue = $element.html();
+                    let tdValue = $element.text();
                     $.fn.saveData(index, field, tdValue);
                     $.fn.delayRender(1);
                 })
             }
         });
-
 
         $.fn.delayRender(50);
     });

@@ -213,6 +213,7 @@
     <Content Include="layer\theme\default\loading-2.gif" />
     <Content Include="Scripts\app.js" />
     <Content Include="Scripts\bootstrap-switch.min.js" />
+    <Content Include="Scripts\bootstrap-treeview.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="datepicker\css\bootstrap-datepicker.css.map" />

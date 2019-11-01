@@ -25,13 +25,13 @@ namespace IntegrateWebApp.Controllers
             return Json(new List<ModelFiles>(), JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult FetchScenes(int? projectId = 366)
+        public ActionResult FetchScenes(int? projectId)
         {
             try
             {
                 using (var db = new IntegrateDbContext())
                 {
-                    string sql = string.Format(StaticSql.SCENES, projectId);
+                    string sql = string.Format(StaticSql.SCENES);
                     List<Sence> sences = db.Database.SqlQuery<Sence>(sql).ToList();
                     return Json(sences, JsonRequestBehavior.AllowGet);
                 }
