@@ -9,6 +9,7 @@
     <div id="toolbar">
         <button id="button" class="btn btn-default">创建场景</button>
         <button id="getTableData" class="btn btn-default">获取数据</button>
+        <span style="color:red;">* 单击表格即可编辑内容，编辑完成后单击【修改】按钮即可</span>
     </div>
     <table id="table"></table>
 </div>
@@ -193,6 +194,17 @@
             $.fn.delayRender(10);
         }
 
+        // 相机位参数
+        $.fn.cameraFormatter = (value, row, index) => {
+            return '<textarea onblur="$.fn.textareaChange(this)" class="form-control" style="width:100%;resize:none" rows="1">'+ row['camera'] +'</textarea>';
+        }
+
+        // 修改相机位数据
+        $.fn.textareaChange = (_this) => {
+            $.fn.saveData($(_this).parent().parent().data('index'), 'camera', $(_this).val());
+            $.fn.delayRender(10);
+        }
+
         $.fn.checkBorderTrueValue = (val) => {
             return $("[name='border_checkbox']")[val].checked;
         }
@@ -332,7 +344,8 @@
                 },
                 {
                     field: 'camera',
-                    title: '默认相机位'
+                    title: '默认相机位',
+                    formatter:$.fn.cameraFormatter
                 },
                 {
                     field: 'defApi',
@@ -345,7 +358,7 @@
             ],
 
             onClickCell: (field, value, row, $element) => {
-                if (field === "borderLine" || field === "showSun" || field === "projectId") {
+                if (field === "borderLine" || field === "showSun" || field === "projectId" || field === "camera") {
                     return;
                 }
                 $element.attr('contenteditable', true);
