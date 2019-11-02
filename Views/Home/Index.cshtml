@@ -163,7 +163,7 @@
             <div class="form-group ">
                 <label class="col-md-3 control-label" for=""></label>
                 <div class="col-md-9">
-                    <input class="btn btn-success" id="" type="submit" value="保存" />
+                    <input class="btn btn-success" id="save" type="button" value="保存" />
                 </div>
             </div>
         </form>
@@ -216,6 +216,7 @@
         let $deviceClass = $('#deviceClass');
         let $config = $('#config');
         let $saveMap = $('#saveMap');
+        let $save = $('#save');
 
 
         // 初始化树结构
@@ -235,24 +236,38 @@
             $.fn.bindEvent();
         };
 
+        // TreeView搜索
         $.fn.searchTree = ($selector,$tree) => {
             if (!$selector) return;
             let pattern = $selector.val();
             let results = $tree.treeview('search', pattern);
-            console.log(results);
+        }
+
+        // 保存系统配置和设备分类映射关系
+        $.fn.saveMap = () => {
+            layer.msg('TODO:保存系统配置和设备分类映射关系');
+        }
+
+        // 创建系统配置
+        $.fn.createSystemConfig = () => {
+            layer.msg('TODO:创建系统配置');
+        }
+
+        // 保存数据
+        $.fn.save = () => {
+            layer.msg('TODO:保存配置数据');
         }
 
         // 事件绑定
         $.fn.bindEvent = () => {
             $sysConfigSearch.bind('click', () => { $.fn.searchTree($sysConfigKeyword, $config) });
             $transferSearch.bind('click', () => { $.fn.searchTree($transfreKeyword, $deviceClass) });
-            $sysConfigCreate.bind('click', () => { layer.msg('TODO:创建系统配置'); });
-            $saveMap.bind('click', () => { layer.msg('TODO:保存系统配置和设备分类映射关系');});
+            $sysConfigCreate.bind('click', () => { $.fn.createSystemConfig() });
+            $save.bind('click', () => { $.fn.save()});
+            $saveMap.bind('click', () => { $.fn.saveMap();});
         }
 
         $.fn.initBootstrapTreeView();
     });
-
-
 
 </script>
