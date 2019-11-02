@@ -1,19 +1,55 @@
-﻿using IntegrateWebApp.Models.Database;
+﻿using ConfigCenterApp.Models.Entity;
+using IntegrateWebApp.Models.Database;
 using IntegrateWebApp.Models.Entity;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace ConfigCenterApp.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+
+        private List<Node> tree = new List<Node>();
+        List<Node> nodes = new List<Node>();
+        public ActionResult Index(int? projectId = 366)
         {
+            using (var db = new IntegrateDbContext())
+            {
+                string sql = string.Format(StaticSql.SYSTEM_CONFIG, projectId);
+                List<SystemConfig> systemConfigList = db.Database.SqlQuery<SystemConfig>(sql).ToList();
+
+                // 构建节点
+                systemConfigList.ForEach(item =>
+                {
+                    nodes.Add(new Node { id = item.id, text = item.sysName, nodes = new List<Node>(), tags = item, code = item.sysCode, parentCode = item.parentCode });
+                });
+
+                // 递归建立父子关系
+                nodes.ForEach(o => buildTree(o));
+                ViewBag.tree = JsonConvert.SerializeObject(tree);
+            }
             return View();
+        }
+
+        private void buildTree(Node node)
+        {
+            if (tree.Contains(node))
+            {
+                return;
+            }
+            var pcode = node.parentCode;
+            if (pcode == null)
+            {
+                tree.Add(node);
+            }
+            else
+            {
+                Node pnode = nodes.Where(item => item.code == pcode).FirstOrDefault();
+                pnode.nodes.Add(node);
+                buildTree(pnode);
+            }
         }
 
         public ActionResult Integrate()
@@ -104,7 +140,7 @@ namespace ConfigCenterApp.Controllers
                     projectItem.Value = item.Id.ToString();
                     projectListItems.Add(projectItem);
 
-                    projectDictionary.Add(item.Id, item.Name );
+                    projectDictionary.Add(item.Id, item.Name);
                 });
                 projectListItems.Insert(0, new SelectListItem { Text = "请选择项目", Value = "-1", Selected = true });
                 ViewBag.SelectItems = projectListItems;

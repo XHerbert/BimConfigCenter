@@ -2,35 +2,69 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <style type="text/css">
-    div {
-        border: solid 0px red;
+    ul {
+        margin-top: 20px;
+    }
+
+    .head {
+        padding-left: 38px;
+    }
+
+    .head_title {
+        font-size: x-large;
+        font-family: sans-serif;
+        margin-bottom: 15px;
     }
 </style>
 
-<div class="row-fluid">
-    <div class="col-md-6">
-        <div class="form-group ">
-            <label class="control-label" for="" title="SYS_CODE">当前项目：国贸3A</label>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="row form-group ">
-            <label class="col-md-3 control-label" for="" title="">复制项目配置：</label>
-            <div class="col-md-9">
-                <select id="disabledSelect" class="form-control">
+<div class="row">&nbsp;</div>
+<div class="alert alert-success">
+    <div class="row">
+        <div class="col-md-6">
+            <label class="control-label" for="" title="">当前项目：国贸3A</label>
+            <div class="form-inline">
+                <label class="control-label" for="" title="">复制项目配置：</label>
+                <select id="disabledSelect" class="form-control" style="width:220px;">
                     <option>- 请选择 -</option>
                     <option>国贸3A</option>
                 </select>
                 <button class="btn btn-success">复制</button>
             </div>
         </div>
+        <div class="col-md-6">
+
+        </div>
     </div>
-    <hr />
 </div>
+<div class="row">&nbsp;</div>
 <div class="row">
     <div class="col-md-6">
-        <div class="col-md-6"><ul id="ztree1" class="ztree"></ul></div>
-        <div class="col-md-6"><ul id="ztree2" class="ztree"></ul></div>
+        <div class="col-md-6">
+            <div class="info head head_title">系统分类</div>
+            <form class="form-inline head">
+                <div class="form-group">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="deviceId" placeholder="请输入系统分类">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary">搜索</button>
+                <button type="button" class="btn btn-success">新建</button>
+            </form>
+            <ul id="config" class="ztree"></ul>
+        </div>
+        <div class="col-md-6">
+            <div class="info head head_title">数字化移交设备分类</div>
+            <form class="form-inline head">
+                <div class="form-group">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="deviceId" placeholder="请输入设备分类">
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary">搜索</button>
+                
+            </form>
+            <ul id="deviceClass" class="ztree"></ul>
+        </div>
     </div>
     <div class="col-md-6">
         <form class="form-horizontal center-block" role="form">
@@ -137,84 +171,60 @@
 
 
 <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/layer/layer.js"></script>
 <script src="~/Scripts/bootstrap-switch.min.js"></script>
 <script src="~/Scripts/bootstrap-treeview.js"></script>
-@*<link href="~/Content/zTreeStyle.css" rel="stylesheet" />
-    <script src="~/Scripts/jquery.ztree.all.min.js"></script>*@
 <script type="text/javascript">
     $("[name='my-checkbox']").bootstrapSwitch();
 </script>
 
-@*<script type="text/javascript">
+<script type="text/javascript">
+    let host = 'http://10.1.73.50:8087/synthesize/'
+    var data = @Html.Raw(ViewBag.tree);
+    //let options = {
+    //    url: host + "queryForEquipmentTree?projectId=366",
+    //    //data: JSON.stringify(data),
+    //    type: 'GET',
+    //    //contentType: 'application/json',
+    //    success: (response) => {
+    //        if (response.code === 20000) {
+    //            layer.msg("获取信息成功！", () => {
+    //                $('#config').treeview({
+    //                    text: "sysName",
+
+    //                    data: response.data
+    //                });
+    //            });
+    //        } else {
+    //            layer.msg(response.message);
+    //        }
+    //    }
+    //};
+    //$.ajax(options);
+
+
+
+
     $(function () {
+        // 初始化树结构
+        $.fn.initBootstrapTreeView = function() {
+            $('#config').treeview({
+                showBorder: false,
+                data: data
+            });
+            $('#config').treeview('collapseAll', { silent: true });
 
-        //创建ztree的配置对象
-        var setting1 = {
-            treeId: "ztree1",
-            data: {
-                simpleData: {
-                    enable: true, //设置使用简单数据格式
-                    idKey: "id",//id标识  可以修改为数据库对应字段
-                    pIdKey: "pId",//父级id
-                    rootPId: 0,//根节点id
-                }
-            },
-            view: {
-                showIcon: false,
-                showLine: false,
-                fontCss: { 'color': '#333', 'font-family': '微软雅黑', 'font-size': '14px' }
-            },
-            check: {
-                enable: true
-            },
-            //设置点击事件
-            callback: {
-                onClick: function (event, treeId, treeNode, clickFlag) {
-                    console.log(treeNode.name)
-                }
-            }
-        }
+            $('#deviceClass').treeview({
+                showCheckbox: true,
+                showBorder: false,
+                data: data
+            });
+            $('#deviceClass').treeview('collapseAll', { silent: true });
+        };
 
-        //树节点数据
-        var zNodes1 = [{
-            "id": 1,
-            "pId": 0,
-            "name": "暖通空调"
-        },
-        {
-            "id": 101,
-            "pId": 1,
-            "name": "送风系统"
-        },
-        {
-            "id": 102,
-            "pId": 1,
-            "name": "排风系统"
-        },
-        {
-            "id": 2,
-            "pId": 0,
-            "name": "变配电"
-        },
-        {
-            "id": 201,
-            "pId": 2,
-            "name": "变电箱"
-        },
-        {
-            "id": 202,
-            "pId": 1,
-            "name": "新风系统"
-        },
-        {
-            "id": 3,
-            "pId": 0,
-            "name": "给排水"
-        },
-        ];
-
-        //初始化第一个树
-        $.fn.zTree.init($("#ztree1"), setting1, zNodes1);
-        $.fn.zTree.init($("#ztree2"), setting1, zNodes1);
+        $.fn.initBootstrapTreeView();
     });
-</script>*@
+
+
+
+</script>

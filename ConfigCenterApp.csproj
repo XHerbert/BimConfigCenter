@@ -156,9 +156,11 @@
     <Compile Include="Models\Database\StaticSql.cs" />
     <Compile Include="Models\Entity\Floor.cs" />
     <Compile Include="Models\Entity\ModelFiles.cs" />
+    <Compile Include="Models\Entity\Node.cs" />
     <Compile Include="Models\Entity\Project.cs" />
     <Compile Include="Models\Entity\Sence.cs" />
     <Compile Include="Models\Entity\Specialty.cs" />
+    <Compile Include="Models\Entity\SystemConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

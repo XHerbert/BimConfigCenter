@@ -13,6 +13,14 @@ namespace IntegrateWebApp.Models.Database
         public static string PROJECT_LIST = "SELECT ID,NAME,CODE FROM `t_project` WHERE ACTIVE_FLAG = 1 ORDER BY ID DESC;";
 
         /// <summary>
+        /// 一级系统配置
+        /// </summary>
+        public static string SYSTEM_CONFIG = @"SELECT ID id,`SYS_NAME` sysName, `SYS_CODE` sysCode,`PROJECT_ID` projectId,`SYS_ICON` sysIcon,`SYS_ORDER` sysOrder ,
+                                                `CREATOR` creator,`CREATE_TIME` createTime,`UPDATE_TIME` updateTime,`PARENT_CODE` parentCode,`IS_SHOW` isShow,`API` api,
+                                                `IOT_API` iotApi,`UI_STYLE` uiStyle,`IOT_MODEL_CODE` iotModelCode,`SYS_PIC` sysPic,`MODEL_STYLE` modelStyle,`MODEL_SHOW_CONDITION` modelShowCondition,`SYS_COLOR` sysColor
+                                                FROM `gfm_system_config` WHERE PROJECT_ID = {0};";
+
+        /// <summary>
         /// 项目下模型文件列表
         /// </summary>
         public static string PROJECT_MODEL_LIST = @"SELECT u.M_ID FILEID,u.NAME,f.`FLOOR`,f.`SPE` SPECIALTY FROM `p_file_upload` u JOIN p_file f ON f.`ID`=u.`FILE_ID`
