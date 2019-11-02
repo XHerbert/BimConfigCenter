@@ -23,6 +23,7 @@ namespace ConfigCenterApp.Controllers
                 var project = string.Format(StaticSql.PROJECT, projectId);
                 var projectEntity = db.Database.SqlQuery<Project>(project).FirstOrDefault();
                 var tplId = projectEntity.TplId;
+                ViewBag.ProjectName = projectEntity.Name;
 
                 // 获取数字化移交设备分类
                 var fileSql = string.Format(StaticSql.TPL_FILE, tplId, projectId);

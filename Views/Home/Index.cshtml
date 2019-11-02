@@ -21,7 +21,7 @@
 <div class="alert alert-success">
     <div class="row">
         <div class="col-md-6">
-            <label class="control-label" for="" title="">当前项目：国贸3A</label>
+            <label class="control-label" for="" title="">当前项目：@ViewBag.ProjectName</label>
             <div class="form-inline">
                 <label class="control-label" for="" title="">复制项目配置：</label>
                 <select id="disabledSelect" class="form-control" style="width:220px;">
@@ -44,11 +44,11 @@
             <form class="form-inline head">
                 <div class="form-group">
                     <div class="form-group">
-                        <input type="text" class="form-control" id="deviceId" placeholder="请输入系统分类">
+                        <input type="text" class="form-control" id="sysConfigKeyword" placeholder="请输入系统分类">
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary">搜索</button>
-                <button type="button" class="btn btn-success">新建</button>
+                <button type="button" id="sysConfigSearch" class="btn btn-primary">搜索</button>
+                <button type="button" id="sysConfigCreate" class="btn btn-success">新建</button>
             </form>
             <ul id="config" class="ztree"></ul>
         </div>
@@ -57,11 +57,12 @@
             <form class="form-inline head">
                 <div class="form-group">
                     <div class="form-group">
-                        <input type="text" class="form-control" id="deviceId" placeholder="请输入设备分类">
+                        <input type="text" class="form-control" id="transfreKeyword" placeholder="请输入设备分类">
                     </div>
                 </div>
-                <button type="button" class="btn btn-primary">搜索</button>
-                
+                <button type="button" id="transferSearch" class="btn btn-primary">搜索</button>
+                <button type="button" id="saveMap" class="btn btn-success">保存映射</button>
+
             </form>
             <ul id="deviceClass" class="ztree"></ul>
         </div>
@@ -207,21 +208,47 @@
 
 
     $(function () {
+        let $sysConfigSearch = $('#sysConfigSearch');
+        let $transferSearch = $('#transferSearch');
+        let $sysConfigCreate = $('#sysConfigCreate');
+        let $sysConfigKeyword = $('#sysConfigKeyword');
+        let $transfreKeyword = $('#transfreKeyword');
+        let $deviceClass = $('#deviceClass');
+        let $config = $('#config');
+        let $saveMap = $('#saveMap');
+
+
         // 初始化树结构
-        $.fn.initBootstrapTreeView = function() {
-            $('#config').treeview({
+        $.fn.initBootstrapTreeView = () => {
+            $config.treeview({
                 showBorder: false,
                 data: systemConfig
             });
-            $('#config').treeview('collapseAll', { silent: true });
+            $config.treeview('collapseAll', { silent: true });
 
-            $('#deviceClass').treeview({
+            $deviceClass.treeview({
                 showCheckbox: true,
                 showBorder: false,
                 data: dataTransfer
             });
-            $('#deviceClass').treeview('collapseAll', { silent: true });
+            $deviceClass.treeview('collapseAll', { silent: true });
+            $.fn.bindEvent();
         };
+
+        $.fn.searchTree = ($selector,$tree) => {
+            if (!$selector) return;
+            let pattern = $selector.val();
+            let results = $tree.treeview('search', pattern);
+            console.log(results);
+        }
+
+        // 事件绑定
+        $.fn.bindEvent = () => {
+            $sysConfigSearch.bind('click', () => { $.fn.searchTree($sysConfigKeyword, $config) });
+            $transferSearch.bind('click', () => { $.fn.searchTree($transfreKeyword, $deviceClass) });
+            $sysConfigCreate.bind('click', () => { layer.msg('TODO:创建系统配置'); });
+            $saveMap.bind('click', () => { layer.msg('TODO:保存系统配置和设备分类映射关系');});
+        }
 
         $.fn.initBootstrapTreeView();
     });
