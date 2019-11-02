@@ -365,6 +365,7 @@
                 $element.blur(function () {
                     let index = $element.parent().data('index');
                     let tdValue = $element.text();
+                    if (tdValue == value) return;
                     $.fn.saveData(index, field, tdValue);
                     $.fn.delayRender(1);
                 })
