@@ -11,46 +11,105 @@ namespace ConfigCenterApp.Controllers
     public class HomeController : Controller
     {
 
-        private List<Node> tree = new List<Node>();
-        List<Node> nodes = new List<Node>();
+        private List<SystemConfigNode> systemConfigTree = new List<SystemConfigNode>();
+        private List<DataTransferNode> dataTransferTree = new List<DataTransferNode>();
+        List<SystemConfigNode> systemConfigNodes = new List<SystemConfigNode>();
+        List<DataTransferNode> dataTransferNodes = new List<DataTransferNode>();
         public ActionResult Index(int? projectId = 366)
         {
             using (var db = new IntegrateDbContext())
             {
-                string sql = string.Format(StaticSql.SYSTEM_CONFIG, projectId);
+
+                var project = string.Format(StaticSql.PROJECT, projectId);
+                var projectEntity = db.Database.SqlQuery<Project>(project).FirstOrDefault();
+                var tplId = projectEntity.TplId;
+
+                // 获取数字化移交设备分类
+                var fileSql = string.Format(StaticSql.TPL_FILE, tplId, projectId);
+                List<File> files = db.Database.SqlQuery<File>(fileSql).ToList();
+
+                var sql = string.Format(StaticSql.SYSTEM_CONFIG, projectId);
                 List<SystemConfig> systemConfigList = db.Database.SqlQuery<SystemConfig>(sql).ToList();
 
-                // 构建节点
+                files.ForEach(file =>
+                {
+                    dataTransferNodes.Add(
+                        new DataTransferNode
+                        {
+                            id = file.Id,
+                            text = file.Name,
+                            nodes = new List<DataTransferNode>(),
+                            tags = file,
+                            code = file.Code,
+                            parentCode = file.ParentId
+                        });
+                });
+                dataTransferNodes.ForEach(o => buildDataTransferTree(o));
+                ViewBag.dataTransferTree = JsonConvert.SerializeObject(dataTransferTree);
+
+                // 构建系统分类节点
                 systemConfigList.ForEach(item =>
                 {
-                    nodes.Add(new Node { id = item.id, text = item.sysName, nodes = new List<Node>(), tags = item, code = item.sysCode, parentCode = item.parentCode });
+                    systemConfigNodes.Add(
+                        new SystemConfigNode
+                        {
+                            id = item.id,
+                            text = item.sysName,
+                            nodes = new List<SystemConfigNode>(),
+                            tags = item,
+                            code = item.sysCode,
+                            parentCode = item.parentCode
+                        });
                 });
 
                 // 递归建立父子关系
-                nodes.ForEach(o => buildTree(o));
-                ViewBag.tree = JsonConvert.SerializeObject(tree);
+                systemConfigNodes.ForEach(o => buildSystemConfigTree(o));
+                ViewBag.systemConfigTree = JsonConvert.SerializeObject(systemConfigTree);
             }
             return View();
         }
 
-        private void buildTree(Node node)
+        private void buildSystemConfigTree(SystemConfigNode node)
         {
-            if (tree.Contains(node))
+            if (systemConfigTree.Contains(node))
             {
                 return;
             }
             var pcode = node.parentCode;
             if (pcode == null)
             {
-                tree.Add(node);
+                systemConfigTree.Add(node);
             }
             else
             {
-                Node pnode = nodes.Where(item => item.code == pcode).FirstOrDefault();
+                SystemConfigNode pnode = systemConfigNodes.Where(item => item.code == pcode).FirstOrDefault();
                 pnode.nodes.Add(node);
-                buildTree(pnode);
+                buildSystemConfigTree(pnode);
             }
         }
+
+        private void buildDataTransferTree(DataTransferNode node)
+        {
+            if (dataTransferTree.Contains(node))
+            {
+                return;
+            }
+            var pcode = node.parentCode;
+            if (pcode == null)
+            {
+                dataTransferTree.Add(node);
+            }
+            else
+            {
+                DataTransferNode pnode = dataTransferNodes.Where(item => item.id == pcode).FirstOrDefault();
+                pnode.nodes.Add(node);
+                buildDataTransferTree(pnode);
+            }
+        }
+
+
+
+
 
         public ActionResult Integrate()
         {

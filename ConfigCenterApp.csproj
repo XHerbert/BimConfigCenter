@@ -154,13 +154,16 @@
     </Compile>
     <Compile Include="Models\Database\IntegrateDbContext.cs" />
     <Compile Include="Models\Database\StaticSql.cs" />
+    <Compile Include="Models\Entity\DataTransferNode.cs" />
+    <Compile Include="Models\Entity\File.cs" />
     <Compile Include="Models\Entity\Floor.cs" />
     <Compile Include="Models\Entity\ModelFiles.cs" />
-    <Compile Include="Models\Entity\Node.cs" />
+    <Compile Include="Models\Entity\SystemConfigNode.cs" />
     <Compile Include="Models\Entity\Project.cs" />
     <Compile Include="Models\Entity\Sence.cs" />
     <Compile Include="Models\Entity\Specialty.cs" />
     <Compile Include="Models\Entity\SystemConfig.cs" />
+    <Compile Include="Models\Node.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

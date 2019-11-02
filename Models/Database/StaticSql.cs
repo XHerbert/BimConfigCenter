@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace IntegrateWebApp.Models.Database
+﻿namespace IntegrateWebApp.Models.Database
 {
     public class StaticSql
     {
@@ -11,6 +6,11 @@ namespace IntegrateWebApp.Models.Database
         /// 项目列表
         /// </summary>
         public static string PROJECT_LIST = "SELECT ID,NAME,CODE FROM `t_project` WHERE ACTIVE_FLAG = 1 ORDER BY ID DESC;";
+
+        /// <summary>
+        /// 根据ID获取项目
+        /// </summary>
+        public static string PROJECT = "SELECT ID Id,NAME Name,CODE Code,TPL_ID TplId FROM `t_project` WHERE ID = {0} AND ACTIVE_FLAG = 1;";
 
         /// <summary>
         /// 一级系统配置
@@ -44,5 +44,9 @@ namespace IntegrateWebApp.Models.Database
                                         `FUNC_CODE` funcCode,`INTEGRATE_ID` integrateId,`MERGER` merger,
                                         `BACK_PIC` backPic,`SHOW_SET` showSet,`BORDER_LINE` borderLine,`SHOW_SUN` showSun,`CAMERA` camera,`DEF_API` defApi FROM `gfm_bim_appinfo` ";
 
+        /// <summary>
+        /// 获取数字化移交设备分类
+        /// </summary>
+        public static string TPL_FILE = "SELECT ID Id,`PROJECT_ID` ProjectId,`CODE` Code,`NAME` Name,`PARENT_ID` ParentId,SEQ Seq FROM `p_tpl_file` WHERE DIR_FLAG IN (1,2) AND TPL_ID = {0} AND FILE_TYPE = 5 AND PROJECT_ID = {1} order by NAME ASC;";
     }
 }

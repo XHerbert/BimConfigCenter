@@ -180,7 +180,8 @@
 
 <script type="text/javascript">
     let host = 'http://10.1.73.50:8087/synthesize/'
-    var data = @Html.Raw(ViewBag.tree);
+    var systemConfig = @Html.Raw(ViewBag.systemConfigTree);
+    var dataTransfer = @Html.Raw(ViewBag.dataTransferTree);
     //let options = {
     //    url: host + "queryForEquipmentTree?projectId=366",
     //    //data: JSON.stringify(data),
@@ -210,14 +211,14 @@
         $.fn.initBootstrapTreeView = function() {
             $('#config').treeview({
                 showBorder: false,
-                data: data
+                data: systemConfig
             });
             $('#config').treeview('collapseAll', { silent: true });
 
             $('#deviceClass').treeview({
                 showCheckbox: true,
                 showBorder: false,
-                data: data
+                data: dataTransfer
             });
             $('#deviceClass').treeview('collapseAll', { silent: true });
         };
