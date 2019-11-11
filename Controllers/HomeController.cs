@@ -107,10 +107,7 @@ namespace ConfigCenterApp.Controllers
                 buildDataTransferTree(pnode);
             }
         }
-
-
-
-
+        
 
         public ActionResult Integrate()
         {

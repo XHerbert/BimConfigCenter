@@ -68,14 +68,14 @@
         </div>
     </div>
     <div class="col-md-6">
-        <form class="form-horizontal center-block" role="form">
+        <form class="form-horizontal center-block" role="form" id="form">
             <div class="form-group">
                 <input class="form-control" id="id" name="id" type="hidden" />
             </div>
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="sysCode" title="SYS_CODE">系统编码</label>
                 <div class="col-md-9 ">
-                    <input class="form-control" id="sysCode" name="sysCode" type="text" placeholder="请输入系统编码(SYS_CODE)" />
+                    <input class="form-control" id="sysCode" name="sysCode" type="number" placeholder="请输入系统编码(SYS_CODE)" />
                 </div>
             </div>
             <div class="form-group ">
@@ -105,7 +105,7 @@
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="parentCode" title="PARENT_CODE">父级节点</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="parentCode" name="parentCode" type="text" placeholder="父级节点(PARENT_CODE)" />
+                    <input class="form-control" id="parentCode" name="parentCode" type="number" placeholder="父级节点(PARENT_CODE)" />
                 </div>
             </div>
             <div class="form-group ">
@@ -226,13 +226,16 @@
         let $$checked = [];
         let $$selected = '';
 
+        let lastSelectedNodeId = null;
+        let lastSelectTime = null;
+
         // 初始化树结构
         $.fn.initBootstrapTreeView = () => {
             $config.treeview({
                 showBorder: false,
                 data: systemConfig,
                 onNodeSelected: (event, node) => {
-                    //console.log(node);
+                    $("input[name='parentCode']").attr('readonly',false);
                     // 单击系统分类时，将数据带给表单
                     let config = node.tags;
                     for (property in config) {
@@ -249,14 +252,14 @@
                         }
                         // 启用Marker
                         if (property === 'modelStyle') {
-                            let isShowVal = config[property] === 1 ? true : false;
-                            $('input[name="modelStyle"]').bootstrapSwitch("state", isShowVal, false);
+                            let modelStyleVal = config[property] === 1 ? true : false;
+                            $('input[name="modelStyle"]').bootstrapSwitch("state", modelStyleVal, false);
                             continue;
                         }
 
                         $("[name='" + property + "']").val(config[property]);
                     }
-                    layer.msg(node.code);
+                    //layer.msg(node.code);
                 }
             });
             $config.treeview('collapseAll', { silent: true });
@@ -291,7 +294,21 @@
 
         // 创建系统配置
         $.fn.createSystemConfig = () => {
-            layer.msg('TODO:创建系统配置');
+            // 获取当前选中的节点，如果没有，则是建立根节点
+            let selected = $config.treeview('getSelected');
+            selected.length === 0 ? $.fn.setParentCode('', true) : $.fn.setParentCode(selected[0].code, false);
+        }
+
+        // 新建时把节点Code带给表单
+        $.fn.setParentCode = (data, root) => {
+            // 清除表单
+            document.getElementById("form").reset();
+            let $parentCode = $("input[name='parentCode']");
+            if (!root) {
+                // 父节点编码赋值
+                $parentCode.attr("readonly", true);
+                $parentCode.val(data);
+            }
         }
 
         // 验证树数据是否合法
@@ -333,6 +350,31 @@
             return true;
         }
 
+        // 模拟节点双击事件
+        $.fn.clickNode = (event, data) => {
+            if (lastSelectedNodeId && lastSelectTime) {
+                let time = new Date().getTime();
+                let t = time - lastSelectTime;
+                if (lastSelectedNodeId == data.nodeId && t < 600) {
+                    $.fn.setParentCode(data);
+                }
+            }
+            lastSelectedNodeId = data.nodeId;
+            lastSelectTime = new Date().getTime();
+        }
+
+        $.fn.dbClickEvent = () => {
+            //节点选中时触发
+            $config.on('nodeSelected', function (event, data) {
+                $.fn.clickNode(event, data)
+                console.log(data);
+            });
+            //节点取消选中时触发
+            $config.on('nodeUnselected', function (event, data) {
+                $.fn.clickNode(event, data)
+            });
+        }
+
         // 保存数据
         $.fn.save = () => {
             layer.msg('TODO:保存配置数据');
@@ -344,7 +386,8 @@
             $transferSearch.bind($clickEvent, () => { $.fn.searchTree($transfreKeyword, $deviceClass) });
             $sysConfigCreate.bind($clickEvent, () => { $.fn.createSystemConfig() });
             $save.bind($clickEvent, () => { $.fn.save()});
-            $saveMap.bind($clickEvent, () => { $.fn.saveMap();});
+            $saveMap.bind($clickEvent, () => { $.fn.saveMap(); });
+            //$.fn.dbClickEvent();
         }
 
         $.fn.initBootstrapTreeView();
