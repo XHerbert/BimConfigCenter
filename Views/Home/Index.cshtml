@@ -69,22 +69,25 @@
     </div>
     <div class="col-md-6">
         <form class="form-horizontal center-block" role="form">
+            <div class="form-group">
+                <input class="form-control" id="id" name="id" type="hidden" />
+            </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="SYS_CODE">系统编码</label>
+                <label class="col-md-3 control-label" for="sysCode" title="SYS_CODE">系统编码</label>
                 <div class="col-md-9 ">
-                    <input class="form-control" id="" type="text" placeholder="请输入系统编码(SYS_CODE)" />
+                    <input class="form-control" id="sysCode" name="sysCode" type="text" placeholder="请输入系统编码(SYS_CODE)" />
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="SYS_NAME">系统名称</label>
+                <label class="col-md-3 control-label" for="sysName" title="SYS_NAME">系统名称</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="请输入系统名称(SYS_NAME)" />
+                    <input class="form-control" id="sysName" name="sysName" type="text" placeholder="请输入系统名称(SYS_NAME)" />
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="SYS_ICON">系统图标</label>
+                <label class="col-md-3 control-label" for="sysIcon" title="SYS_ICON">系统图标</label>
                 <div class="col-md-9">
-                    <select id="disabledSelect" class="form-control">
+                    <select id="sysIcon" name="sysIcon" class="form-control">
                         <option>- 请选择 -</option>
                         <option>HVAC</option>
                         <option>electricTrans</option>
@@ -94,70 +97,70 @@
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="SYS_ORDER">系统排序</label>
+                <label class="col-md-3 control-label" for="sysOrder" title="SYS_ORDER">系统排序</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="number" placeholder="请输入顺序(SYS_ORDER)" />
+                    <input class="form-control" id="sysOrder" name="sysOrder" type="number" placeholder="请输入顺序(SYS_ORDER)" />
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="PARENT_CODE">父级节点</label>
+                <label class="col-md-3 control-label" for="parentCode" title="PARENT_CODE">父级节点</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="父级节点(PARENT_CODE)" />
+                    <input class="form-control" id="parentCode" name="parentCode" type="text" placeholder="父级节点(PARENT_CODE)" />
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="IS_SHOW">是否显示</label>
+                <label class="col-md-3 control-label" for="isShow" title="IS_SHOW">是否显示</label>
                 <div class="col-md-9">
-                    <input type="checkbox" name="my-checkbox" data-on-text="显示" data-off-text="隐藏" checked>
+                    <input type="checkbox" name="isShow" id="isShow" data-on-text="显示" data-off-text="隐藏" checked>
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="API">API</label>
+                <label class="col-md-3 control-label" for="api" title="API">API</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="二级接口地址" />
+                    <input class="form-control" id="api" name="api" type="text" placeholder="二级接口地址" />
                 </div>
             </div>
 
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="IOT_API">IOT数据接口</label>
+                <label class="col-md-3 control-label" for="iotApi" title="IOT_API">IOT数据接口</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="请输入IOT数据接口地址" />
+                    <input class="form-control" id="iotApi" name="iotApi" type="text" placeholder="请输入IOT数据接口地址" />
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="UI_STYLE">UI样式</label>
+                <label class="col-md-3 control-label" for="uiStyle" title="UI_STYLE">UI样式</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="请输入UI样式" />
+                    <input class="form-control" id="uiStyle" name="uiStyle" type="text" placeholder="请输入UI样式" />
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="IOT_MODEL_CODE">IOT模型编码</label>
+                <label class="col-md-3 control-label" for="iotModelCode" title="IOT_MODEL_CODE">IOT模型编码</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder="请输入IOT模型编码，如EAF" />
+                    <input class="form-control" id="iotModelCode" name="iotModelCode" type="text" placeholder="请输入IOT模型编码，如EAF" />
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="SYS_PIC">系统展示图片</label>
+                <label class="col-md-3 control-label" for="sysPic" title="SYS_PIC">系统展示图片</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="file" placeholder="上传系统展示图片" />
+                    <input class="form-control" id="sysPic" name="sysPic" type="file" placeholder="上传系统展示图片" />
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="MODEL_STYLE">启用3DMarker</label>
+                <label class="col-md-3 control-label" for="modelStyle" title="MODEL_STYLE">启用3DMarker</label>
                 <div class="col-md-9 text-left">
-                    <input type="checkbox" name="my-checkbox" value="0" data-on-text="启用" data-off-text="禁用" checked="checked">
+                    <input type="checkbox" name="modelStyle" id="modelStyle" value="0" data-on-text="启用" data-off-text="禁用" checked="checked">
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="MODEL_SHOW_CONDITION">构件筛选条件</label>
+                <label class="col-md-3 control-label" for="modelShowCondition" title="MODEL_SHOW_CONDITION">构件筛选条件</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="text" placeholder='如[{"levelName":"F07"}]' />
+                    <input class="form-control" id="modelShowCondition" name="modelShowCondition" type="text" placeholder='如[{"levelName":"F07"}]' />
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="" title="SYS_COLOR">系统颜色</label>
+                <label class="col-md-3 control-label" for="sysColor" title="SYS_COLOR">系统颜色</label>
                 <div class="col-md-9">
-                    <input class="form-control" id="" type="color" placeholder="报警数据统计颜色,如#05A3FF" />
+                    <input class="form-control" id="sysColor" name="sysColor" type="color" placeholder="报警数据统计颜色,如#05A3FF" />
                 </div>
             </div>
             <div class="form-group ">
@@ -176,7 +179,8 @@
 <script src="~/Scripts/bootstrap-switch.min.js"></script>
 <script src="~/Scripts/bootstrap-treeview.js"></script>
 <script type="text/javascript">
-    $("[name='my-checkbox']").bootstrapSwitch();
+    $("[name='isShow']").bootstrapSwitch();
+    $("[name='modelStyle']").bootstrapSwitch();
 </script>
 
 <script type="text/javascript">
@@ -217,20 +221,55 @@
         let $config = $('#config');
         let $saveMap = $('#saveMap');
         let $save = $('#save');
+        let $clickEvent = 'click';
 
+        let $$checked = [];
+        let $$selected = '';
 
         // 初始化树结构
         $.fn.initBootstrapTreeView = () => {
             $config.treeview({
                 showBorder: false,
-                data: systemConfig
+                data: systemConfig,
+                onNodeSelected: (event, node) => {
+                    //console.log(node);
+                    // 单击系统分类时，将数据带给表单
+                    let config = node.tags;
+                    for (property in config) {
+                        console.log(property + ":" + config[property]);
+                        // 是否显示
+                        if (property === 'isShow') {
+                            let isShowVal = config[property] === 1 ? true : false;
+                            $('input[name="isShow"]').bootstrapSwitch("state", isShowVal, false);
+                            continue;
+                        }
+                        // 系统图片
+                        if (property === 'sysPic') {
+                            continue;
+                        }
+                        // 启用Marker
+                        if (property === 'modelStyle') {
+                            let isShowVal = config[property] === 1 ? true : false;
+                            $('input[name="modelStyle"]').bootstrapSwitch("state", isShowVal, false);
+                            continue;
+                        }
+
+                        $("[name='" + property + "']").val(config[property]);
+                    }
+                    layer.msg(node.code);
+                }
             });
             $config.treeview('collapseAll', { silent: true });
 
             $deviceClass.treeview({
                 showCheckbox: true,
                 showBorder: false,
-                data: dataTransfer
+                selectable: false,
+                data: dataTransfer,
+                onNodeChecked: (event, node) => {
+                    console.log(node);
+                    layer.msg(node.id);
+                }
             });
             $deviceClass.treeview('collapseAll', { silent: true });
             $.fn.bindEvent();
@@ -245,12 +284,53 @@
 
         // 保存系统配置和设备分类映射关系
         $.fn.saveMap = () => {
-            layer.msg('TODO:保存系统配置和设备分类映射关系');
+            if ($.fn.validateTree()) {
+                layer.msg('TODO:保存系统配置和设备分类映射关系');
+            }
         }
 
         // 创建系统配置
         $.fn.createSystemConfig = () => {
             layer.msg('TODO:创建系统配置');
+        }
+
+        // 验证树数据是否合法
+        $.fn.validateTree = () => {
+            //TODO:验证树数据是否符合入库条件
+
+            // 获取被选中的节点集合
+            let selected = $config.treeview('getSelected');
+
+            // 获取被勾选的集合
+            let checked = $deviceClass.treeview('getChecked');
+
+            console.log(selected.length + ' | ' + checked.length);
+
+            if (!selected.length || !checked.length) {
+                layer.msg('尚未选择[设备分类]或[系统分类]！');
+                return false;
+            }
+
+            // 将末级节点存入数组
+            $$checked = [];
+            for (let i = 0, len = checked.length; i < len; i++) {
+                if (checked[i].nodes.length == 0) {
+                    $$checked.push(checked[i].id);
+                }
+            }
+            $.fn.c($$checked);
+            let _device = $$checked.length;
+            if (!_device) {
+                layer.msg('请勾选设备分类的末级节点');
+                return false;
+            }
+
+            // 系统分类
+            if (selected.nodes.length) {
+                layer.msg('请选择系统分类');
+                return false;
+            }
+            return true;
         }
 
         // 保存数据
@@ -260,14 +340,18 @@
 
         // 事件绑定
         $.fn.bindEvent = () => {
-            $sysConfigSearch.bind('click', () => { $.fn.searchTree($sysConfigKeyword, $config) });
-            $transferSearch.bind('click', () => { $.fn.searchTree($transfreKeyword, $deviceClass) });
-            $sysConfigCreate.bind('click', () => { $.fn.createSystemConfig() });
-            $save.bind('click', () => { $.fn.save()});
-            $saveMap.bind('click', () => { $.fn.saveMap();});
+            $sysConfigSearch.bind($clickEvent, () => { $.fn.searchTree($sysConfigKeyword, $config) });
+            $transferSearch.bind($clickEvent, () => { $.fn.searchTree($transfreKeyword, $deviceClass) });
+            $sysConfigCreate.bind($clickEvent, () => { $.fn.createSystemConfig() });
+            $save.bind($clickEvent, () => { $.fn.save()});
+            $saveMap.bind($clickEvent, () => { $.fn.saveMap();});
         }
 
         $.fn.initBootstrapTreeView();
+
+        $.fn.c = (args) => {
+            console.log(args);
+        }
     });
 
 </script>
