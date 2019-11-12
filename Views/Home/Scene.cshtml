@@ -1,7 +1,6 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     List<SelectListItem> projectId = ViewBag.SelectItems as List<SelectListItem>;
-    //List<IntegrateWebApp.Models.Entity.Project> projects = ViewBag.Projects as List<IntegrateWebApp.Models.Entity.Project>;
     IDictionary<int, string> projects = ViewBag.Projects as Dictionary<int, string>;
 }
 <div class="row">&nbsp;</div>
@@ -23,10 +22,12 @@
 <script src="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.15.3/dist/locale/bootstrap-table-zh-CN.min.js"></script>
 <script src="~/layer/layer.js"></script>
+<script src="~/Scripts/hostLib.js"></script>
+
 <script type="text/javascript">
 
     let _project_list = @Html.Raw(ViewBag.Projects);
-    let host = 'http://10.1.73.50:8079/api/scene/';
+    let host = hostAddr.scene;
     $(function () {
         let $table = $('#table');
         let $button = $('#button');
