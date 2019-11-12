@@ -187,7 +187,6 @@
     $("[name='isShow']").bootstrapSwitch({
         onSwitchChange: (event, state) => {
             let which = event.target.attributes['data-id'].value;
-            layer.msg(which + "|" + state);
         }
     });
     $("[name='isShow']").bootstrapSwitch("state", true);
@@ -195,7 +194,6 @@
         state: true,
         onSwitchChange: (event, state) => {
             let which = event.target.attributes['data-id'].value;
-            layer.msg(which + "|" + state);
         }
     });
     $("[name='modelStyle']").bootstrapSwitch("state", true);
@@ -253,7 +251,7 @@
                             $('input[name="modelStyle"]').bootstrapSwitch("state", modelStyleVal, false);
                             continue;
                         }
-
+                        // 为表单赋值
                         $("[name='" + property + "']").val(config[property]);
                     }
                 }
@@ -327,6 +325,8 @@
         $.fn.setParentCode = (data, root) => {
             // 清除表单
             document.getElementById("form").reset();
+            document.getElementById("id").value = 0;
+            console.log($('#form').serializeArray());
             let $parentCode = $("input[name='parentCode']");
             if (!root) {
                 // 父节点编码赋值
@@ -397,7 +397,7 @@
             });
         }
 
-        // 保存数据
+        // 保存系统配置数据
         $.fn.save = () => {
             let bootstrapValidator = $("#form").data('bootstrapValidator');
             bootstrapValidator.validate();
@@ -414,9 +414,28 @@
                 _config.sysOrder = Number(_config.sysOrder);
                 _config.isShow = $isShow.bootstrapSwitch('state') === true ? 1 : 0;
                 _config.modelStyle = $modelStyle.bootstrapSwitch('state') === true ? 1 : 0;
+                _config.projectId = Number($projectId.val());
                 console.log(_config);
 
                 // 提交数据
+                let action = _config.id === 0 ? "createConfig" : "updateConfig";
+                let method = _config.id === 0 ? "POST" : "PUT";
+                let options = {
+                    url: host + action,
+                    data: JSON.stringify(_config),
+                    type: method,
+                    contentType: 'application/json',
+                    success: (response) => {
+                        if (response.code === 20000) {
+                            layer.msg("系统配置数据保存成功！", { icon: 1 }, () => {
+                                window.location.reload(true);
+                            });
+                        } else {
+                            layer.msg(response.message);
+                        }
+                    }
+                }
+                $.ajax(options);
 
             }
         }
@@ -442,7 +461,6 @@
                 },
                 fields: {
                     sysCode: {
-                        message: '系统编码验证失败',
                         validators: {
                             notEmpty: {
                                 message: '系统编码不能为空'
@@ -459,7 +477,7 @@
                 }
             })
         }
-        
+
         // 执行初始化
         $.fn.initBootstrapTreeView();
 

@@ -78,7 +78,7 @@ namespace ConfigCenterApp.Controllers
                 return;
             }
             var pcode = node.parentCode;
-            if (pcode == null)
+            if (string.IsNullOrEmpty(pcode))
             {
                 systemConfigTree.Add(node);
             }
