@@ -66,6 +66,7 @@ namespace ConfigCenterApp.Controllers
                 // 递归建立父子关系
                 systemConfigNodes.ForEach(o => buildSystemConfigTree(o));
                 ViewBag.systemConfigTree = JsonConvert.SerializeObject(systemConfigTree);
+                ViewBag.ProjectId = projectId;
             }
             return View();
         }

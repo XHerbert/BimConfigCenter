@@ -18,6 +18,9 @@
 </style>
 
 <div class="row">&nbsp;</div>
+<div class="alert alert-danger">
+    <b>* 说明：创建系统分类和系统分类与设备分类的映射关系的步骤，可参考「帮助文档」菜单下的「系统配置」页面</b>
+</div>
 <div class="alert alert-success">
     <div class="row">
         <div class="col-md-6">
@@ -32,7 +35,7 @@
             </div>
         </div>
         <div class="col-md-6">
-
+            <input type="hidden" value="@ViewBag.ProjectId" id="projectId" />
         </div>
     </div>
 </div>
@@ -111,7 +114,7 @@
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="isShow" title="IS_SHOW">是否显示</label>
                 <div class="col-md-9">
-                    <input type="checkbox" name="isShow" id="isShow" data-on-text="显示" data-off-text="隐藏" checked>
+                    <input type="checkbox" name="isShow" id="isShow" data-id="isShow" data-on-text="显示" data-off-text="隐藏" checked>
                 </div>
             </div>
             <div class="form-group ">
@@ -120,7 +123,6 @@
                     <input class="form-control" id="api" name="api" type="text" placeholder="二级接口地址" />
                 </div>
             </div>
-
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="iotApi" title="IOT_API">IOT数据接口</label>
                 <div class="col-md-9">
@@ -148,7 +150,7 @@
             <div class="form-group ">
                 <label class="col-md-3 control-label" for="modelStyle" title="MODEL_STYLE">启用3DMarker</label>
                 <div class="col-md-9 text-left">
-                    <input type="checkbox" name="modelStyle" id="modelStyle" value="0" data-on-text="启用" data-off-text="禁用" checked="checked">
+                    <input type="checkbox" name="modelStyle" id="modelStyle" data-id="modelStyle" data-on-text="启用" data-off-text="禁用" checked>
                 </div>
             </div>
             <div class="form-group ">
@@ -178,38 +180,31 @@
 <script src="~/layer/layer.js"></script>
 <script src="~/Scripts/bootstrap-switch.min.js"></script>
 <script src="~/Scripts/bootstrap-treeview.js"></script>
+<link href="~/Content/bootstrapValidator.min.css" rel="stylesheet" />
+<script src="~/Scripts/bootstrapValidator.min.js"></script>
+<script src="~/datepicker/locales/bootstrapValidator.zh_CN.js"></script>
 <script type="text/javascript">
-    $("[name='isShow']").bootstrapSwitch();
-    $("[name='modelStyle']").bootstrapSwitch();
+    $("[name='isShow']").bootstrapSwitch({
+        onSwitchChange: (event, state) => {
+            let which = event.target.attributes['data-id'].value;
+            layer.msg(which + "|" + state);
+        }
+    });
+    $("[name='isShow']").bootstrapSwitch("state", true);
+    $("[name='modelStyle']").bootstrapSwitch({
+        state: true,
+        onSwitchChange: (event, state) => {
+            let which = event.target.attributes['data-id'].value;
+            layer.msg(which + "|" + state);
+        }
+    });
+    $("[name='modelStyle']").bootstrapSwitch("state", true);
 </script>
 
 <script type="text/javascript">
-    let host = 'http://10.1.73.50:8087/synthesize/'
+    let host = 'http://10.1.73.13:8079/api/system/config/'
     var systemConfig = @Html.Raw(ViewBag.systemConfigTree);
     var dataTransfer = @Html.Raw(ViewBag.dataTransferTree);
-    //let options = {
-    //    url: host + "queryForEquipmentTree?projectId=366",
-    //    //data: JSON.stringify(data),
-    //    type: 'GET',
-    //    //contentType: 'application/json',
-    //    success: (response) => {
-    //        if (response.code === 20000) {
-    //            layer.msg("获取信息成功！", () => {
-    //                $('#config').treeview({
-    //                    text: "sysName",
-
-    //                    data: response.data
-    //                });
-    //            });
-    //        } else {
-    //            layer.msg(response.message);
-    //        }
-    //    }
-    //};
-    //$.ajax(options);
-
-
-
 
     $(function () {
         let $sysConfigSearch = $('#sysConfigSearch');
@@ -217,14 +212,16 @@
         let $sysConfigCreate = $('#sysConfigCreate');
         let $sysConfigKeyword = $('#sysConfigKeyword');
         let $transfreKeyword = $('#transfreKeyword');
+        let $isShow = $("[name='isShow']");
+        let $modelStyle = $("[name='modelStyle']");
         let $deviceClass = $('#deviceClass');
         let $config = $('#config');
         let $saveMap = $('#saveMap');
         let $save = $('#save');
         let $clickEvent = 'click';
+        let $projectId = $('#projectId');
 
         let $$checked = [];
-        let $$selected = '';
 
         let lastSelectedNodeId = null;
         let lastSelectTime = null;
@@ -259,11 +256,9 @@
 
                         $("[name='" + property + "']").val(config[property]);
                     }
-                    //layer.msg(node.code);
                 }
             });
             $config.treeview('collapseAll', { silent: true });
-
             $deviceClass.treeview({
                 showCheckbox: true,
                 showBorder: false,
@@ -275,6 +270,7 @@
                 }
             });
             $deviceClass.treeview('collapseAll', { silent: true });
+            $.fn.validateForm();
             $.fn.bindEvent();
         };
 
@@ -288,7 +284,35 @@
         // 保存系统配置和设备分类映射关系
         $.fn.saveMap = () => {
             if ($.fn.validateTree()) {
-                layer.msg('TODO:保存系统配置和设备分类映射关系');
+
+                // 准备数据
+                let projectId = $projectId.val();
+                let sysCode = $config.treeview('getSelected')[0].code;
+                let equTypeIdList = $deviceClass.treeview('getChecked');
+                let referData = [];
+
+                for (let i = 0; i < equTypeIdList.length; i++) {
+                    let item = { projectId: Number(projectId), sysCode: sysCode, equTypeId: equTypeIdList[i].id };
+                    referData.push(item);
+                }
+                console.log(JSON.stringify(referData));
+
+                let options = {
+                    url: host + "createBatchReference",
+                    data: JSON.stringify(referData),
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: (response) => {
+                        if (response.code === 20000) {
+                            layer.msg("映射关系保存成功！", { icon: 1 }, () => {
+                                window.location.reload(true);
+                            });
+                        } else {
+                            layer.msg(response.message);
+                        }
+                    }
+                };
+                $.ajax(options);
             }
         }
 
@@ -321,10 +345,8 @@
             // 获取被勾选的集合
             let checked = $deviceClass.treeview('getChecked');
 
-            console.log(selected.length + ' | ' + checked.length);
-
             if (!selected.length || !checked.length) {
-                layer.msg('尚未选择[设备分类]或[系统分类]！');
+                layer.msg('尚未选择[设备分类]或[系统分类]！', { icon: 5 });
                 return false;
             }
 
@@ -343,10 +365,10 @@
             }
 
             // 系统分类
-            if (selected.nodes.length) {
-                layer.msg('请选择系统分类');
-                return false;
-            }
+            //if (selected.nodes.length) {
+            //    layer.msg('请选择系统分类');
+            //    return false;
+            //}
             return true;
         }
 
@@ -377,7 +399,26 @@
 
         // 保存数据
         $.fn.save = () => {
-            layer.msg('TODO:保存配置数据');
+            let bootstrapValidator = $("#form").data('bootstrapValidator');
+            bootstrapValidator.validate();
+            if (bootstrapValidator.isValid()) {
+                // 准备表单数据
+                let formData = $('#form').serializeArray();
+                let _config = {};
+                for (let i = 0; i < formData.length; i++) {
+                    _config[formData[i].name] = formData[i].value;
+                }
+
+                // 处理数据
+                _config.id = Number(_config.id);
+                _config.sysOrder = Number(_config.sysOrder);
+                _config.isShow = $isShow.bootstrapSwitch('state') === true ? 1 : 0;
+                _config.modelStyle = $modelStyle.bootstrapSwitch('state') === true ? 1 : 0;
+                console.log(_config);
+
+                // 提交数据
+
+            }
         }
 
         // 事件绑定
@@ -390,11 +431,41 @@
             //$.fn.dbClickEvent();
         }
 
+        // 系统配置表单验证
+        $.fn.validateForm = () => {
+            $('#form').bootstrapValidator({
+                message: 'This value is not valid',
+                feedbackIcons: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    sysCode: {
+                        message: '系统编码验证失败',
+                        validators: {
+                            notEmpty: {
+                                message: '系统编码不能为空'
+                            }
+                        }
+                    },
+                    sysName: {
+                        validators: {
+                            notEmpty: {
+                                message: '系统名称不能为空'
+                            }
+                        }
+                    }
+                }
+            })
+        }
+        
+        // 执行初始化
         $.fn.initBootstrapTreeView();
 
         $.fn.c = (args) => {
             console.log(args);
-        }
+        };
     });
 
 </script>

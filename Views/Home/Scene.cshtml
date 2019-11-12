@@ -4,12 +4,15 @@
     //List<IntegrateWebApp.Models.Entity.Project> projects = ViewBag.Projects as List<IntegrateWebApp.Models.Entity.Project>;
     IDictionary<int, string> projects = ViewBag.Projects as Dictionary<int, string>;
 }
-
+<div class="row">&nbsp;</div>
+<div class="alert alert-danger">
+    <b>* 说明：单击表格即可编辑内容，编辑完成后单击【修改】按钮即可</b>
+</div>
 <div class="table-box" style="margin: 20px;">
     <div id="toolbar">
         <button id="button" class="btn btn-default">创建场景</button>
-        <button id="getTableData" class="btn btn-default">获取数据</button>
-        <span style="color:red;">* 单击表格即可编辑内容，编辑完成后单击【修改】按钮即可</span>
+        <button id="getTableData" class="btn btn-default" style="display:none">获取数据</button>
+        <span style="color:red;"></span>
     </div>
     <table id="table"></table>
 </div>
@@ -123,7 +126,7 @@
                 contentType: 'application/json',
                 success: (response) => {
                     if (response.code === 20000) {
-                        layer.msg("场景[" + row_data['mergeName'] + "]创建成功！", () => {
+                        layer.msg("场景[" + row_data['mergeName'] + "]创建成功！", { icon: 1 } ,() => {
                             window.location.reload(true);
                         });
                     } else {
