@@ -1,0 +1,216 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style type="text/css">
+    ul {
+        margin-top: 20px;
+    }
+
+    .head {
+        padding-left: 38px;
+    }
+
+    .head_title {
+        font-size: x-large;
+        font-family: sans-serif;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="row">&nbsp;</div>
+<div class="alert alert-danger">
+    <b>* 说明：设置设备属性信息分组配置的步骤，可参考「帮助文档」菜单下的「设备属性信息分组配置」页面</b>
+</div>
+<div class="alert alert-success">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-inline">
+                <label class="control-label" for="" title="">当前项目：【国贸3A】</label>
+                <select id="disabledSelect" class="form-control" style="width:220px;">
+                    <option>- 请选择 -</option>
+                    <option>国贸3A</option>
+                </select>
+                @*<button class="btn btn-success">复制</button>*@
+            </div>
+        </div>
+        <div class="col-md-6">
+            <input type="hidden" value=366 id="projectId" />
+        </div>
+    </div>
+</div>
+<div class="row">&nbsp;</div>
+<div class="row">
+    <div class="col-md-3">
+        <div class="col-md-12">
+            <form class="form-inline head">
+                <div class="form-group">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="sysConfigKeyword" placeholder="请输入系统分类">
+                    </div>
+                </div>
+                <button type="button" id="sysConfigSearch" class="btn btn-primary">搜索</button>
+            </form>
+            <ul id="config" class="ztree"></ul>
+        </div>
+
+    </div>
+    <div class="col-md-9">
+        <table id="table" data-detail-view="true"></table>
+    </div>
+</div>
+
+<link href="~/Content/bootstrap-table.min.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/layer/layer.js"></script>
+<script src="~/Scripts/bootstrap-switch.min.js"></script>
+<script src="~/Scripts/bootstrap-treeview.js"></script>
+<script src="~/Scripts/hostLib.js"></script>
+
+<script src="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.15.4/locale/bootstrap-table-zh-CN.js"></script>
+
+
+<script type="text/javascript">
+    let host = hostAddr.equPropGroup;
+    let $config = $('#config');
+    let $table = $('#table');
+    let $projectId = $('#projectId');
+    let $data = '@Url.Content("~/Scripts/data.json")';
+
+
+    $(function () {
+
+        // 初始化树结构
+        let options = {
+            url: hostAddr.system_config + "getSystemConfigTree?projectId=366",
+            type: method.GET,
+            contentType: 'application/json',
+            success: (response) => {
+                if (response.code === 20000) {
+                    $.fn.initBootstrapTreeView(response);
+                } else {
+                    layer.msg(response.message, { icon: 5 });
+                }
+            }
+        }
+        $.ajax(options);
+
+        // 初始化树结构
+        $.fn.initBootstrapTreeView = (response) => {
+            $config.treeview({
+                showBorder: false,
+                data: response.data,
+                onNodeSelected: (event, node) => {
+                    // 单击系统分类时，将数据带给表单
+                    let systemCode = node.tags.sysCode;
+                    let projectId = Number($projectId.val());
+                    $.fn.initTable(projectId, systemCode);
+
+                }
+            });
+            $config.treeview('collapseAll', { silent: true });
+        };
+
+        // 按钮样式
+        $.fn.buttonFormatter = (value, row, index) => {
+            __content = '<button onclick="$.fn.chooseProperty()" class="btn btn-warning btn-sm">选择属性</button>';
+            return [__content];
+        }
+
+        $.fn.switchFormatter = (value, row, index) => {
+            let isShow = row.isShow === 1 ? true : false;
+            console.log(isShow);
+            let __content = '';
+            if (isShow) {
+                __content = '<input class="_switch_" id="border' + row['sceneId'] + '"  data-type = "border"  data-scene-id = ' + row['sceneId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="border_checkbox" checked>';
+            } else {
+                __content = '<input class="_switch_" id="border' + row['sceneId'] + '"  data-type = "border" data-scene-id = ' + row['sceneId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="border_checkbox">';
+            }
+            return __content;
+        }
+
+        // 根据数据初始化树形表格，先销毁表格再加载数据
+        $.fn.initTable = (projectId, systemCode) => {
+            $table.bootstrapTable('destroy').bootstrapTable({
+                url: host + 'getEquPropGroupList?projectId=' + projectId + '&systemCode=' + systemCode,
+                method: method.GET,
+                detailView: true,
+                pagination: true, 
+                cache: false,
+                striped: true,
+                theadClasses: "thead-dark",
+                pageSize: 10,
+                pageList: [10, 25],
+                columns: [
+                    {
+                        field: 'groupName',
+                        title: '分组名称'
+                    },
+                    {
+                        field: 'systemCode',
+                        title: '分组排序'
+                    },
+                    {
+                        field: 'operation',
+                        title: '<button class="btn btn-success btn-sm" onclick = "$.fn.createNewGroup()">创建分组</button>',
+                        formatter: $.fn.buttonFormatter
+                    }],
+                //注册加载子表的事件。注意下这里的三个参数！ row会传递数据到子表
+                onExpandRow: function (index, row, $detail) {
+                    $.fn.initSubTable(index, row, $detail);
+                }
+            });
+        };
+
+        // 创建新分组
+        $.fn.createNewGroup = () => {
+            layer.msg("TODO:新增分组", { icon: 1 });
+        }
+
+        // 选择属性
+        $.fn.chooseProperty = (json) => {
+            layer.msg("TODO:选择属性", { icon: 1 });
+        }
+
+        // 子表展开
+        $.fn.initSubTable = function (index, row, $detail) {
+            console.log(row);
+            let groupName = row.groupName;
+            let sysCode = row.systemCode;
+            let cur_table = $detail.html('<table></table>').find('table');
+            $(cur_table).bootstrapTable({
+                url: host +'getExpandEquGroupPropertyList',
+                method: 'get',
+                queryParams: { projectId: $projectId.val(), systemCode: sysCode, groupName: groupName },
+
+                clickToSelect: true,
+                detailView: false,//父子表
+                uniqueId: "paramId",
+                pageSize: 10,
+                pageList: [10, 25],
+                columns: [{
+                    field: 'paramName',
+                    title: '属性名称'
+                }, {
+                        field: 'paramId',
+                        title: '属性代码'
+                    }, {
+                        field: 'systemCode',
+                        title: '排序'
+                    }, {
+                        field: 'isShow',
+                        title: '是否在设备标签中显示',
+                        formatter: $.fn.switchFormatter 
+                    }],
+                onExpandRow: function (index, row, $Subdetail) {
+
+                }
+            });
+        };
+
+    });
+</script>
+
+
+

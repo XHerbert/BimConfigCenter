@@ -1,6 +1,6 @@
 ﻿
 <!DOCTYPE html>
-<html>
+<html lang="zh_CN">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8" />
@@ -22,7 +22,25 @@
                     <li><a href="/Home/Index">系统配置</a></li>
                     <li><a href="/">模型集成</a></li>
                     <li><a href="/Home/Scene">业务场景配置</a></li>
-                    <li><a href="/Home/Scene">运行状态条件</a></li>
+                    
+
+
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            设备管理
+                            <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="/Home/Scene">运行状态条件</a>
+                                <a class="dropdown" href="/Device/DeviceGroup">设备属性信息分组配置</a>
+                                <a class="dropdown" href="#">设备列表字段配置</a>
+                            </li>
+                        </ul>
+                    </li>
+
+
+
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             二级系统
@@ -43,9 +61,10 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li>
-                                <a class="dropdown" href="#">系统配置</a>
-                                <a class="dropdown" href="#">模型集成</a>
-                                <a class="dropdown" href="#">业务场景配置</a>
+                                <a class="dropdown" href="/Help/SystemConfig">系统配置</a>
+                                <a class="dropdown" href="/Help/SystemConfig">模型集成</a>
+                                <a class="dropdown" href="/Help/SystemConfig">业务场景配置</a>
+                                <a class="dropdown" href="/Help/SystemConfig">设备属性信息分组配置</a>
                             </li>
                         </ul>
                     </li>
@@ -60,7 +79,7 @@
                 <p>&copy; @DateTime.Now.Year - 运维数据配置中心</p>
             </footer>*@
     </div>
-    @Scripts.Render("~/bundles/bootstrap")
+
     @*@Scripts.Render("~/bundles/jquery")
         @Scripts.Render("~/bundles/bootstrap")
         @Scripts.Render("~/bundles/bootstrapswitch");*@

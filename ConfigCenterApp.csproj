@@ -147,6 +147,8 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\DeviceController.cs" />
+    <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\OperationController.cs" />
     <Compile Include="Global.asax.cs">
@@ -168,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-switch.min.css" />
+    <Content Include="Content\bootstrap-table.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -218,6 +221,8 @@
     <Content Include="layer\theme\default\loading-2.gif" />
     <Content Include="Scripts\app.js" />
     <Content Include="Scripts\bootstrap-switch.min.js" />
+    <Content Include="Scripts\bootstrap-table-zh-CN.min.js" />
+    <Content Include="Scripts\bootstrap-table.min.js" />
     <Content Include="Scripts\bootstrap-treeview.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -257,7 +262,8 @@
     <Content Include="Views\Home\_SystemTree.cshtml" />
     <Content Include="Views\Home\_DeviceTree.cshtml" />
     <Content Include="Views\Home\Integrate.cshtml" />
-    <Content Include="data2.json" />
+    <Content Include="Views\Help\SystemConfig.cshtml" />
+    <Content Include="Views\Device\DeviceGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

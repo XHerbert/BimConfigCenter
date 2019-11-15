@@ -16,11 +16,12 @@
     <table id="table"></table>
 </div>
 
-<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.css">
+<link rel="stylesheet" href="~/Content/bootstrap-table.min.css">
 <script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
 <script src="~/Scripts/bootstrap-switch.min.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.15.3/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="~/Scripts/bootstrap-table.min.js"></script>
+<script src="~/Scripts/bootstrap-table-zh-CN.min.js"></script>
 <script src="~/layer/layer.js"></script>
 <script src="~/Scripts/hostLib.js"></script>
 
@@ -286,6 +287,7 @@
             toolbar: '#toolbar',
             clickEdit: false,
             striped: true,
+            undefinedText:'N/A',
             //showToggle: true,
             pagination: true,       //显示分页条
             //showColumns: true,
