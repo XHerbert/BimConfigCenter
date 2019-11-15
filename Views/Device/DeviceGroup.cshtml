@@ -76,8 +76,6 @@
     let $config = $('#config');
     let $table = $('#table');
     let $projectId = $('#projectId');
-    let $data = '@Url.Content("~/Scripts/data.json")';
-
 
     $(function () {
 
@@ -118,14 +116,15 @@
             return [__content];
         }
 
+        // 格式化开关插件
         $.fn.switchFormatter = (value, row, index) => {
             let isShow = row.isShow === 1 ? true : false;
             console.log(isShow);
             let __content = '';
             if (isShow) {
-                __content = '<input class="_switch_" id="border' + row['sceneId'] + '"  data-type = "border"  data-scene-id = ' + row['sceneId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="border_checkbox" checked>';
+                __content = '<input class="_switch_"   id="show' + row['paramId'] + '"  data-show = true  data-param-id = ' + row['paramId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="show_checkbox" checked>';
             } else {
-                __content = '<input class="_switch_" id="border' + row['sceneId'] + '"  data-type = "border" data-scene-id = ' + row['sceneId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="border_checkbox">';
+                __content = '<input class="_switch_"  id="show' + row['paramId'] + '"  data-show = false data-param-id = ' + row['paramId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="show_checkbox">';
             }
             return __content;
         }
@@ -136,7 +135,7 @@
                 url: host + 'getEquPropGroupList?projectId=' + projectId + '&systemCode=' + systemCode,
                 method: method.GET,
                 detailView: true,
-                pagination: true, 
+                pagination: true,
                 cache: false,
                 striped: true,
                 theadClasses: "thead-dark",
@@ -185,14 +184,14 @@
                 queryParams: { projectId: $projectId.val(), systemCode: sysCode, groupName: groupName },
 
                 clickToSelect: true,
-                detailView: false,//父子表
+                detailView: false,
                 uniqueId: "paramId",
                 pageSize: 10,
                 pageList: [10, 25],
                 columns: [{
-                    field: 'paramName',
-                    title: '属性名称'
-                }, {
+                        field: 'paramName',
+                        title: '属性名称'
+                    }, {
                         field: 'paramId',
                         title: '属性代码'
                     }, {
@@ -201,14 +200,30 @@
                     }, {
                         field: 'isShow',
                         title: '是否在设备标签中显示',
-                        formatter: $.fn.switchFormatter 
+                        formatter: $.fn.switchFormatter
                     }],
                 onExpandRow: function (index, row, $Subdetail) {
 
                 }
             });
+            $.fn.initSwitch(groupName,true);
         };
 
+        // 按是否显示初始化插件
+        $.fn.initSwitch = () => {
+            setTimeout(() => {
+                $('input._switch_').filter($.fn.checkIsShowTrueValue).bootstrapSwitch("state", true, false);
+                $('input._switch_').filter($.fn.checkIsShowFalseValue).bootstrapSwitch("state", false, false);
+            }, 250)
+        }
+
+        $.fn.checkIsShowTrueValue = (val) => {
+            return $('input._switch_')[val].checked;
+        }
+
+        $.fn.checkIsShowFalseValue = (val) => {
+            return !$('input._switch_')[val].checked;
+        }
     });
 </script>
 
