@@ -1,0 +1,82 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">&nbsp;</div>
+<div class="alert alert-danger">
+    <b>* 说明：设置设备属性信息分组配置的步骤，可参考「帮助文档」菜单下的「设备属性信息分组配置」页面</b>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form>
+            <textarea id="source" placeholder='输入形如 [{"Id":"1739965298509376.3295358"},{"Id":"1739965298509376.3299524"}]的数据结构' class="form-control" rows="14" style="resize:none;"></textarea>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form>
+            <p>&nbsp;</p>
+            <button type="button" id="convert" class="btn btn-primary">转换</button>
+            <p>&nbsp;</p>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form>
+            <textarea id="target" class="form-control" placeholder='输出形如 ["1739965298509376.3295358","1739965298509376.3299524"]的数据结构' rows="14" style="resize:none;"></textarea>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <form>
+            <p>&nbsp;</p>
+            <button type="button" id="copy" class="btn btn-success">复制</button>
+            <p>&nbsp;</p>
+        </form>
+    </div>
+</div>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/layer/layer.js"></script>
+<script src="~/Scripts/hostLib.js"></script>
+<script type="text/javascript">
+
+    let $source = $('#source');
+    let $target = $('#target');
+    let $convert = $('#convert');
+    let $copy = $('#copy');
+
+
+    $.fn.bindEvent = () => {
+        $convert.bind('click', () => {
+            let value = $source.val();
+            // 发送数据并转换
+            let option = {
+                url: '/Device/ConvertReferenceJson',
+                type: method.POST,
+                dataType: "json",
+                data: { json: value },
+                success: (response) => {
+                    $target.val(JSON.stringify(response));
+                }
+            };
+            $.ajax(option);
+        });
+        $copy.bind('click', () => {
+            document.querySelector("#target").select();
+            document.execCommand('copy');
+            layer.msg("copy ok!", { icon: 1 });
+        });
+    }
+    $.fn.bindEvent();
+
+</script>

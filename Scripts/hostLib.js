@@ -3,7 +3,7 @@
  * 以及常用常量
  **/
 
-var ip = 'http://10.1.73.13:8079';
+var ip = 'http://10.1.73.67:8079';
 var hostAddr = {
     system_config: ip + '/api/system/config/',
     scene: ip + '/api/scene/',

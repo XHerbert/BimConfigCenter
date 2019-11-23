@@ -110,7 +110,7 @@
             $config.treeview('collapseAll', { silent: true });
         };
 
-        // 按钮样式
+        // 选择属性按钮样式
         $.fn.buttonFormatter = (value, row, index) => {
             __content = '<button onclick="$.fn.chooseProperty()" class="btn btn-warning btn-sm">选择属性</button>';
             return [__content];
@@ -119,12 +119,13 @@
         // 格式化开关插件
         $.fn.switchFormatter = (value, row, index) => {
             let isShow = row.isShow === 1 ? true : false;
-            console.log(isShow);
+            let currentTd = $(this);
+            console.log(row);
             let __content = '';
             if (isShow) {
-                __content = '<input class="_switch_"   id="show' + row['paramId'] + '"  data-show = true  data-param-id = ' + row['paramId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="show_checkbox" checked>';
+                __content = '<input class="_switch_" style="visibility:hidden;"  id="show' + row['paramId'] + '"  data-show = true  data-param-id = ' + row['paramId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="show_checkbox" checked>';
             } else {
-                __content = '<input class="_switch_"  id="show' + row['paramId'] + '"  data-show = false data-param-id = ' + row['paramId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="show_checkbox">';
+                __content = '<input class="_switch_" style="visibility:hidden;" id="show' + row['paramId'] + '"  data-show = false data-param-id = ' + row['paramId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="show_checkbox">';
             }
             return __content;
         }
@@ -152,7 +153,7 @@
                     },
                     {
                         field: 'operation',
-                        title: '<button class="btn btn-success btn-sm" onclick = "$.fn.createNewGroup()">创建分组</button>',
+                        title: '<button class="btn btn-success btn-sm" id="createGroup" onclick = "$.fn.createNewGroup()">创建分组</button>',
                         formatter: $.fn.buttonFormatter
                     }],
                 //注册加载子表的事件。注意下这里的三个参数！ row会传递数据到子表
@@ -160,6 +161,7 @@
                     $.fn.initSubTable(index, row, $detail);
                 }
             });
+            // $('#createGroup').attr("disable", true);
         };
 
         // 创建新分组
@@ -202,18 +204,34 @@
                         title: '是否在设备标签中显示',
                         formatter: $.fn.switchFormatter
                     }],
-                onExpandRow: function (index, row, $Subdetail) {
-
+                onLoadSuccess: function (index, row, $Subdetail) {
+                    console.log("groupName:" + groupName);
+                    $.fn.initSwitch(groupName, true);
                 }
             });
-            $.fn.initSwitch(groupName,true);
+            
         };
 
         // 按是否显示初始化插件
         $.fn.initSwitch = () => {
+            
             setTimeout(() => {
-                $('input._switch_').filter($.fn.checkIsShowTrueValue).bootstrapSwitch("state", true, false);
-                $('input._switch_').filter($.fn.checkIsShowFalseValue).bootstrapSwitch("state", false, false);
+               
+                let $filterTrue = $('input._switch_').filter($.fn.checkIsShowTrueValue);
+                let $filterFalse = $('input._switch_').filter($.fn.checkIsShowFalseValue);
+                $filterTrue.bootstrapSwitch("state", true, false);
+                $filterFalse.bootstrapSwitch("state", false, false);
+                console.log("$filterTrue:" + $filterTrue.length);
+                console.log("$filterFalse:" + $filterFalse.length);
+
+                
+                $('input._switch_').bootstrapSwitch({
+                    onSwitchChange: (event, state) => {
+                        let which = event.target.attributes['data-show'].value;
+                        layer.msg(which);
+                    }
+                });
+                
             }, 250)
         }
 

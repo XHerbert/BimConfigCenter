@@ -48,5 +48,45 @@
         /// 获取数字化移交设备分类
         /// </summary>
         public static string TPL_FILE = "SELECT ID Id,`PROJECT_ID` ProjectId,`CODE` Code,`NAME` Name,`PARENT_ID` ParentId,SEQ Seq FROM `p_tpl_file` WHERE DIR_FLAG IN (1,2) AND TPL_ID = {0} AND FILE_TYPE = 5 AND PROJECT_ID = {1} order by NAME ASC;";
+
+        /// <summary>
+        /// 批量添加空间信息
+        /// </summary>
+        public static string ADD_SPACE_WEIGHT = "INSERT INTO  `gfm_energy_interpolation_weight` (`PROJECT_ID`,`INTEGRATION_ID`,`SPACE_ID`,`FLOOR`,`WEIGHT`,`CREATE_TIME`,`BATCH_GUID`) VALUES {0}";
+
+        /// <summary>
+        /// 更新权重信息
+        /// </summary>
+        public static string UPDATE_WEIGHT = "UPDATE `gfm_energy_interpolation_weight` SET WEIGHT = '{0}' WHERE SPACE_ID = '{1}'";
+
+        public static string QUERY_SPACE = "SELECT SPACE_ID Id,WEIGHT Weight FROM `gfm_energy_interpolation_weight`";
+
+        /// <summary>
+        /// 温感（烟感代替）信息
+        /// </summary>
+        public static string TEMPERATURE_POINT = @"SELECT Id,BoundingBox FROM `bim_t_element` WHERE Id IN 
+                                                (
+                                                    '1689689599747552.2350281',
+                                                    '1689689599747552.2353938',
+                                                    '1689689599747552.2350956',
+                                                    '1689689599747552.2350638',
+                                                    '1689689599747552.2348600',
+                                                    '1689689599747552.2351604',
+                                                    '1689689599747552.2347245',
+                                                    '1689689599747552.2351041',
+                                                    '1689689599747552.2352443',
+                                                    '1689689599747552.2346298',
+                                                    '1689689599747552.2347599',
+                                                    '1689689599747552.2361359',
+                                                    '1689689599747552.2348737',
+                                                    '1689689599747552.2349029',
+                                                    '1689689599747552.2349119',
+                                                    '1689689599747552.2349196',
+                                                    '1689689599747552.2353105',
+                                                    '1689689599747552.2353538',
+                                                    '1689689599747552.2346327',
+                                                    '1689689599747552.2346485',
+                                                    '1689689599747552.2346512'
+                                                  )";
     }
 }

@@ -1,0 +1,372 @@
+﻿
+@{
+    Layout = null;
+    var list = ViewBag.Position as List<ConfigCenterApp.Models.Entity.TemperaturePoint>;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>BimfaceApplication</title>
+    <style media="screen">
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #view {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <script src="https://static.bimface.com/api/BimfaceSDKLoader/BimfaceSDKLoader@latest-release.js"
+            charset="utf-8"></script>
+    <script src="https://cdn.bootcss.com/FileSaver.js/2014-11-29/FileSaver.js"></script>
+</head>
+<body>
+    <div id="view"></div>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <script type="text/javascript">
+        var viewer;
+        var keyFrames = [];
+        var keyFramesF07 = [];
+        var wt;
+        var hasPropety = 0;
+        var sectionContainer;
+        var BimfaceLoaderConfig = new BimfaceSDKLoaderConfig();
+        BimfaceLoaderConfig.viewToken = getURLParameter('@ViewBag.viewToken');
+        BimfaceLoaderConfig.viewToken = "003b95d50b554031a213ff9eb3a5183a";
+
+        BimfaceSDKLoader.load(BimfaceLoaderConfig, onSDKLoadSucceeded, onSDKLoadFailed);
+
+        // *****  begin 原始数据，空间的四个顶点，以此作为空间拆分的依据  *****
+        let rightBottom = [{
+            "z": 29849.998804527939,
+            "y": 15015.834547481974,
+            "x": 102047.92304662752
+        }, {
+            "z": 29849.998804527939,
+            "y": 15015.834547481973,
+            "x": 102670.92302167691
+        }
+        ];
+        let leftBottom = [{
+            "z": 29849.998804527939,
+            "y": 15015.767919419595,
+            "x": 47712.0389004021
+        }, {
+            "z": 29849.998804527939,
+            "y": 14259.881627351764,
+            "x": 48467.925192469927
+        }
+        ];
+        let leftTop = [
+            {
+                "z": 29849.998804527939,
+                "y": 67839.098598531971,
+                "x": 47712.038900402214
+            }, {
+                "z": 29849.998804527939,
+                "y": 67839.098598531971,
+                "x": 47088.9918757596
+            }
+        ];
+        let rightTop = [{
+            "z": 29849.998804527939,
+            "y": 67842.15043176031,
+            "x": 102044.74033336528
+        }, {
+            "z": 29849.998804527939,
+            "y": 68591.683589799766,
+            "x": 101295.20717532584
+        }
+        ];
+        // *****  end 原始数据，空间的四个顶点，以此作为空间拆分的依据  *****
+
+        // *****  begin 点位计算存储容器以及单元计算、基准坐标  *****
+        let pointCollection = [];
+
+        // 最重要的入参，分割单元，可绘制N*N个空间
+        let N = 50;
+        let save = 0;
+        let unitX = (rightBottom[0].x - leftTop[0].x) / N;
+        let unitY = (leftTop[0].y - rightBottom[0].y) / N;
+        let unitZ = leftTop[0].z;
+
+        console.log("unitX", unitX);
+        console.log("unitY", unitY);
+
+        // 最佳视角
+        let camera = {
+            "name": "persp",
+            "position": {
+                "x": 112714.89947434566,
+                "y": 78890.36550392154,
+                "z": 55435.63886657131
+            },
+            "target": {
+                "x": 84555.07467039209,
+                "y": 50914.34788907759,
+                "z": 30329.63490038224
+            },
+            "up": {
+                "x": 0,
+                "y": -0.000003673205501131022,
+                "z": 0.9999999999932537
+            },
+            "fov": 45,
+            "version": 1
+        }
+
+        // 基准坐标
+        let _baseX = leftBottom[0].x;
+        let _baseY = leftBottom[0].y;
+
+        for (let b = 0, len = N; b <= len; b++) {
+            for (let d = 0, len = N; d <= len; d++) {
+                let x = _baseX + (unitX * d);
+                let y = _baseY + (unitY * b);
+                let z = unitZ;
+                pointCollection.push([x, y, z]);
+            }
+        }
+        // *****  end 点位计算存储容器以及单元计算、基准坐标  *****
+
+
+        // *****  begin 构造边界信息  *****
+        let starter = new Date().getTime();
+        let counter = 0; // 计数器，每隔N个跳一次
+        let offset = 0;
+        let oo = [];
+        for (let k = 0; k < N * N; k++) {  // N*N 表示有N*N个方块
+            let t_point = [];
+            let firstIndex = offset + k;
+            let secondIndex = offset + k + 1;
+            let thirdIndex = offset + k + N + 2;
+            let fourthIndex = offset + k + N + 1;
+
+            if (counter > 0 && counter % N == 0) {
+                firstIndex += 1;
+                secondIndex += 1;
+                thirdIndex += 1;
+                fourthIndex += 1;
+                offset += 1;
+                counter = 0;
+            }
+
+            t_point.push(pointCollection[firstIndex]);
+            t_point.push(pointCollection[secondIndex]);
+            t_point.push(pointCollection[thirdIndex]);
+            t_point.push(pointCollection[fourthIndex]);
+            oo.push(t_point);
+            counter += 1;
+        }
+        let ender = new Date().getTime();
+        console.log("数据耗时：" + (ender - starter) + "ms");
+        let savedata = [];
+        let colorful = @Html.Raw(ViewBag.TemperatureData);
+        let v = @Html.Raw(ViewBag.V);
+
+        function onSDKLoadSucceeded(viewMetaData) {
+            if (viewMetaData.viewType == "3DView") {
+                var view = document.getElementById('view')
+                var config = new Glodon.Bimface.Application.WebApplication3DConfig();
+                config.domElement = view;
+                var eventManager = Glodon.Bimface.Application.WebApplication3DEvent;
+                app = new Glodon.Bimface.Application.WebApplication3D(config);
+                viewer = app.getViewer();
+                viewer.setCameraAnimation(true);
+                viewer.addModel(viewMetaData);
+
+                var sectionConfig = new Glodon.Bimface.Plugins.Section.SectionBoxConfig();
+                sectionConfig.viewer = viewer;
+
+                viewer.addEventListener(Glodon.Bimface.Viewer.Viewer3DEvent.ViewAdded, function () {
+                    //隐藏构件树
+                    document.getElementsByClassName('bf-button gld-bf-tree')[0].style = "display:none";
+                    //隐藏工具栏
+                    document.getElementsByClassName('bf-toolbar bf-toolbar-bottom')[0].style = "display:none";
+
+                    var colorRed = new Glodon.Web.Graphics.Color(0, 0, 0, 1);
+                    viewer.setWireframeColor(colorRed);
+                    viewer.setBackgroundColor(new Glodon.Web.Graphics.Color(30, 33, 40, 1), new Glodon.Web.Graphics.Color(130, 33, 40, 1));
+                    viewer.hideComponentsById(["3317312"]);
+                    viewer.render();
+
+                    // 产生渐变色[用于测试]
+                    //let colors = new gradientColor('#84bf96', '#27342b', 2500);
+
+                    let start = new Date().getTime();
+
+                    for (let p = 0; p < oo.length; p++) {
+                        if (1) {
+                            let colors = colorful[p].Value.split(',');
+                            let color = new Glodon.Web.Graphics.Color(colors[0] * 1, colors[1] * 1, colors[2] * 1, 1);
+                            drawR(oo[p], color, p + 1);
+                        }
+                        let points = oo[p];
+
+                        // 计算空间中心点                        
+                        let _point_X = (points[2][0] + points[0][0]) * 0.5;
+                        let _point_Y = (points[2][1] + points[0][1]) * 0.5;
+                        let _point_Z = 3500;
+
+                        //存储数据
+                        let __data = {
+                            // 空间编号
+                            id: p + 1, 
+                            // 空间中心坐标
+                            position: _point_X.toString() + "," + _point_Y.toString() + "," + _point_Z.toString() 
+                        }
+                        savedata.push(__data);
+                    }
+
+                    let content = JSON.stringify(savedata);
+                    let blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+                    if (save) {
+                        saveAs(blob, "data.json");
+                    }
+                    viewer.render();
+                    let end = new Date().getTime();
+                    console.log((end - start) + "ms");
+                    viewer.setCameraStatus(camera);
+                });
+            }
+        };
+        
+        // 绘制空间的核心方法
+        function drawR(points, color, guid) {
+            let coreAreaBoundary = viewer.createAreaInfo(guid, points);
+            // 根据边界、高度、名字画出空间
+            viewer.createRoom(coreAreaBoundary, 4500, guid);
+            // 给空间着色
+            //viewer.setAreasColorById([guid], new Glodon.Web.Graphics.Color(getRandomColor(), 1));
+            //viewer.setAreasColorById([guid], new Glodon.Web.Graphics.Color(c, 1));
+            viewer.setRoomsColorById([guid], color);
+            // 给空间的线框着色，无色
+            viewer.setRoomsFrameColorById([guid], new Glodon.Web.Graphics.Color(0, 0, 0, 0));
+        }
+
+        function draw(boundary, roomColor, frameColor, _id) {
+            //let _id = guid();
+            viewer.createRoom(boundary, 3500, _id);
+            viewer.setRoomsColorById([_id], roomColor);
+            viewer.setRoomsFrameColorById([_id], frameColor);
+        }
+
+        function getURLParameter(name) {
+            return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null;
+        }
+
+        function onSDKLoadFailed() {
+            console.error('failed');
+        }
+
+
+        function gradientColor(startColor, endColor, step) {
+            var startRGB = this.colorRgb(startColor);//转换为rgb数组模式
+            var startR = startRGB[0];
+            var startG = startRGB[1];
+            var startB = startRGB[2];
+            var endRGB = this.colorRgb(endColor);
+            var endR = endRGB[0];
+            var endG = endRGB[1];
+            var endB = endRGB[2];
+            var sR = (endR - startR) / step;//总差值
+            var sG = (endG - startG) / step;
+            var sB = (endB - startB) / step;
+            var colorArr = [];
+            for (var i = 0; i < step; i++) {
+                //计算每一步的hex值
+                var hex = rgbToHex('rgb(' + parseInt((sR * i + startR)) + ',' + parseInt((sG * i + startG)) + ',' + parseInt((sB * i + startB)) + ')');
+
+                colorArr.push(hex);
+            }
+            return colorArr;
+        }
+
+        const rgbToHex = (color) => {
+            let arr = color.split(',');
+            let r = +arr[0].split('(')[1];
+            let g = +arr[1];
+            let b = +arr[2].split(')')[0];
+            let value = (1 << 24) + r * (1 << 16) + g * (1 << 8) + b;
+            value = value.toString(16);
+            return '#' + value.slice(1);
+        };
+
+        // 将hex表示方式转换为rgb表示方式(这里返回rgb数组模式)
+        gradientColor.prototype.colorRgb = function (sColor) {
+            var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+            var sColor = sColor.toLowerCase();
+            if (sColor && reg.test(sColor)) {
+                if (sColor.length === 4) {
+                    var sColorNew = "#";
+                    for (var i = 1; i < 4; i += 1) {
+                        sColorNew += sColor.slice(i, i + 1).concat(sColor.slice(i, i + 1));
+                    }
+                    sColor = sColorNew;
+                }
+                //处理六位的颜色值
+                var sColorChange = [];
+                for (var i = 1; i < 7; i += 2) {
+                    sColorChange.push(parseInt("0x" + sColor.slice(i, i + 2)));
+                }
+                return sColorChange;
+            } else {
+                return sColor;
+            }
+        };
+
+        function guid(index) {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function guidX(index) {
+            return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = index * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        var getRandomColor = function () {
+            return '#' + ('00000' + (Math.random() * 0x1000000 << 0).toString(16)).slice(-6);
+        }
+
+        var colorRgb = function (sColor) {
+            sColor = sColor.toLowerCase();
+            //十六进制颜色值的正则表达式
+            var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+            // 如果是16进制颜色
+            if (sColor && reg.test(sColor)) {
+                if (sColor.length === 4) {
+                    var sColorNew = "#";
+                    for (var i = 1; i < 4; i += 1) {
+                        sColorNew += sColor.slice(i, i + 1).concat(sColor.slice(i, i + 1));
+                    }
+                    sColor = sColorNew;
+                }
+                //处理六位的颜色值
+                var sColorChange = [];
+                for (var i = 1; i < 7; i += 2) {
+                    sColorChange.push(parseInt("0x" + sColor.slice(i, i + 2)));
+                }
+                return sColorChange;
+            }
+            return sColor;
+        };
+    </script>
+</body>
+</html>

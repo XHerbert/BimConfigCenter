@@ -151,21 +151,28 @@
     <Compile Include="Controllers\HelpController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\OperationController.cs" />
+    <Compile Include="Controllers\WeightController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Database\IntegrateDbContext.cs" />
     <Compile Include="Models\Database\StaticSql.cs" />
+    <Compile Include="Models\Entity\BlockPoint.cs" />
+    <Compile Include="Models\Entity\BoundingBox.cs" />
+    <Compile Include="Models\Entity\Coordinate.cs" />
     <Compile Include="Models\Entity\DataTransferNode.cs" />
     <Compile Include="Models\Entity\File.cs" />
     <Compile Include="Models\Entity\Floor.cs" />
     <Compile Include="Models\Entity\ModelFiles.cs" />
+    <Compile Include="Models\Entity\PointWeight.cs" />
     <Compile Include="Models\Entity\SystemConfigNode.cs" />
     <Compile Include="Models\Entity\Project.cs" />
     <Compile Include="Models\Entity\Sence.cs" />
     <Compile Include="Models\Entity\Specialty.cs" />
     <Compile Include="Models\Entity\SystemConfig.cs" />
     <Compile Include="Models\Entity\Node.cs" />
+    <Compile Include="Models\Entity\TemperaturePoint.cs" />
+    <Compile Include="Models\Entity\TemperaturePointOriginal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -230,6 +237,7 @@
     <Content Include="datepicker\css\bootstrap-datepicker.standalone.css.map" />
     <Content Include="datepicker\css\bootstrap-datepicker3.css.map" />
     <Content Include="datepicker\css\bootstrap-datepicker3.standalone.css.map" />
+    <Content Include="App_Data\data.json" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\bootstrapValidator.min.js" />
@@ -264,10 +272,10 @@
     <Content Include="Views\Home\Integrate.cshtml" />
     <Content Include="Views\Help\SystemConfig.cshtml" />
     <Content Include="Views\Device\DeviceGroup.cshtml" />
+    <Content Include="Views\Device\ConvertReferenceView.cshtml" />
+    <Content Include="Views\Weight\Index.cshtml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

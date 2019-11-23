@@ -13,5 +13,25 @@ namespace ConfigCenterApp.Controllers
         {
             return View();
         }
+
+        public ActionResult ConvertReferenceView()
+        {
+            return View();
+        }
+
+        public ActionResult ConvertReferenceJson(string json)
+        {
+            if (string.IsNullOrEmpty(json))
+            {
+                return Content(string.Empty);
+            }
+
+            string _json = json.Replace("\"Id\":", "");
+            _json = _json.Replace("{", "").Replace("}", "");
+
+
+
+            return Content(_json.ToString());
+        }
     }
 }
