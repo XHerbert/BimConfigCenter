@@ -77,6 +77,7 @@ document.getElementById('clear').addEventListener("click", function () {
     $('#integs').html('');
     $('#integs').append(descDom);
     $("tr#desc").css("display", "block");
+    calcFileCount(0);
 });
 
 
@@ -240,6 +241,7 @@ function addThis(obj) {
     obj.setAttribute('data-added', true);
     obj.style.color = 'red';
     $('table#integs').append(tr);
+    calcFileCount();
 }
 
 
@@ -260,6 +262,7 @@ function removeThis(obj) {
     if ($('#integs input').length === 0) {
         $("tr#desc").css("display", "block");
     }
+    calcFileCount();
 }
 
 
@@ -293,7 +296,7 @@ function loadSubFiles(load) {
                 tr += '<td width="80"><a style="cursor:pointer" onclick="removeThis(this)" data-id="' + resp.fileId + '">移除</a></td></tr>';
                 $('table#integs').append(tr);
             }
-
+            calcFileCount();
             // close current dialog
             $("#his").css("display", "none");
             $("div.bee-modal-mask").css("display", "none");
@@ -302,6 +305,16 @@ function loadSubFiles(load) {
 
     // send request
     $.ajax(options);
+}
+
+// calculate integrate files
+function calcFileCount(count) {
+    if (count !== undefined) {
+        $('#fct').text("0");
+        return;
+    }
+    let ct = $('.tr-index').length;
+    $('#fct').text(ct);
 }
 
 

@@ -25,7 +25,7 @@ namespace ConfigCenterApp.Controllers
         // GET: Weight
         public ActionResult Index(bool write = false, string viewToken = "003b95d50b554031a213ff9eb3a5183a")
         {
-            InitTemperatureValue();
+            InitTemperatureValue2();
             List<double> values = new List<double>();
             List<TemperaturePoint> temperaturePoints = new List<TemperaturePoint>();
             string sql = StaticSql.TEMPERATURE_POINT;
@@ -49,6 +49,7 @@ namespace ConfigCenterApp.Controllers
                 {
                     //if (string.IsNullOrEmpty(item.Weight))
                     //    return;
+                    // 1689689599747552.2346327:0.0961006025123045; 1689689599747552.2346298:0.0901430435338005; 
                     double degree = 0;
                     string[] weights = item.Weight.Split(';');
                     foreach (string weight in weights)
@@ -61,7 +62,7 @@ namespace ConfigCenterApp.Controllers
                         degree += m_temperatureValue[keyValue[0]] * value;
                     }
                     Color realrgb = ConvertDegreeToRGB(degree);
-                    values.Add(degree);
+                    values.Add(degree); 
                     R = realrgb.R; G = realrgb.G; B = realrgb.B;
                     string rgb = string.Format("{0},{1},{2}", R, G, B);
                     //直接把当前元素添加到，key对应的List集合中。
@@ -401,7 +402,7 @@ namespace ConfigCenterApp.Controllers
             m_temperatureValue.Add("1689689599747552.2347245", 22.9);
             m_temperatureValue.Add("1689689599747552.2351041", 21.6);
             m_temperatureValue.Add("1689689599747552.2352443", 27.3);
-            m_temperatureValue.Add("1689689599747552.2346298", 3.5);
+            m_temperatureValue.Add("1689689599747552.2346298", 38.5);
             m_temperatureValue.Add("1689689599747552.2347599", 35.6);
             m_temperatureValue.Add("1689689599747552.2361359", 30.1);
             m_temperatureValue.Add("1689689599747552.2348737", 3.0);
@@ -412,7 +413,55 @@ namespace ConfigCenterApp.Controllers
             m_temperatureValue.Add("1689689599747552.2353538", 32.2);
             m_temperatureValue.Add("1689689599747552.2346327", 32.1);
             m_temperatureValue.Add("1689689599747552.2346485", 20.0);
-            m_temperatureValue.Add("1689689599747552.2346512", 6.4);
+            m_temperatureValue.Add("1689689599747552.2346512", 66.4);
+
+            //m_temperatureValue.Add("1689689599747552.2350281", 10.0);
+            //m_temperatureValue.Add("1689689599747552.2353938", 20.0);
+            //m_temperatureValue.Add("1689689599747552.2350956", 30.0);
+            //m_temperatureValue.Add("1689689599747552.2350638", 40.0);
+            //m_temperatureValue.Add("1689689599747552.2348600", 30.0);
+            //m_temperatureValue.Add("1689689599747552.2351604", 20.0);
+            //m_temperatureValue.Add("1689689599747552.2347245", 10.0);
+            //m_temperatureValue.Add("1689689599747552.2351041", 20.0);
+            //m_temperatureValue.Add("1689689599747552.2352443", 30.0);
+            //m_temperatureValue.Add("1689689599747552.2346298", 40.0);
+            //m_temperatureValue.Add("1689689599747552.2347599", 50.0);
+            //m_temperatureValue.Add("1689689599747552.2361359", 60.0);
+            //m_temperatureValue.Add("1689689599747552.2348737", 50.0);
+            //m_temperatureValue.Add("1689689599747552.2349029", 40.0);
+            //m_temperatureValue.Add("1689689599747552.2349119", 30.0);
+            //m_temperatureValue.Add("1689689599747552.2349196", 20.0);
+            //m_temperatureValue.Add("1689689599747552.2353105", 10.0);
+            //m_temperatureValue.Add("1689689599747552.2353538", 60.0);
+            //m_temperatureValue.Add("1689689599747552.2346327", 20.0);
+            //m_temperatureValue.Add("1689689599747552.2346485", 50.0);
+            //m_temperatureValue.Add("1689689599747552.2346512", 10.0);
+        }
+
+        private void InitTemperatureValue2()
+        {
+            m_temperatureValue.Clear();
+            m_temperatureValue.Add("1689689599747552.2350281", 10.0);
+            m_temperatureValue.Add("1689689599747552.2353938", 10.0);
+            m_temperatureValue.Add("1689689599747552.2350956", 10.0);
+            m_temperatureValue.Add("1689689599747552.2350638", 10.0);
+            m_temperatureValue.Add("1689689599747552.2348600", 10.0);
+            m_temperatureValue.Add("1689689599747552.2351604", 10.0);
+            m_temperatureValue.Add("1689689599747552.2347245", 10.0);
+            m_temperatureValue.Add("1689689599747552.2351041", 10.0);
+            m_temperatureValue.Add("1689689599747552.2352443", 10.0);
+            m_temperatureValue.Add("1689689599747552.2346298", 50.0);
+            m_temperatureValue.Add("1689689599747552.2347599", 50.0);
+            m_temperatureValue.Add("1689689599747552.2361359", 50.0);
+            m_temperatureValue.Add("1689689599747552.2348737", 50.0);
+            m_temperatureValue.Add("1689689599747552.2349029", 50.0);
+            m_temperatureValue.Add("1689689599747552.2349119", 10.0);
+            m_temperatureValue.Add("1689689599747552.2349196", 10.0);
+            m_temperatureValue.Add("1689689599747552.2353105", 10.0);
+            m_temperatureValue.Add("1689689599747552.2353538", 10.0);
+            m_temperatureValue.Add("1689689599747552.2346327", 10.0);
+            m_temperatureValue.Add("1689689599747552.2346485", 10.0);
+            m_temperatureValue.Add("1689689599747552.2346512", 10.0);
 
             //m_temperatureValue.Add("1689689599747552.2350281", 10.0);
             //m_temperatureValue.Add("1689689599747552.2353938", 20.0);

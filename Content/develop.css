@@ -18578,7 +18578,7 @@ hr {
 
 .bee-modal-wrapper {
     position: absolute;
-    max-height: 100vh;
+    max-height: 90vh;
     display: flex;
     flex-direction: column;
     top: 50%;
@@ -18588,7 +18588,8 @@ hr {
     background: #fff;
     border-radius: 3px;
     border: 1px solid #ddd;
-    z-index: 199
+    z-index: 199;
+    overflow-y:scroll;
 }
 
     .bee-modal-wrapper.fullScreen {
