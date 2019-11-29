@@ -38,13 +38,14 @@
                     <span style="color: rgb(102, 102, 102); font-size: 14px;">模型集成配置为按需加载：</span>
                     <div class="bee-input">
                         <span class="bee-input-label"></span>
-                        @Html.DropDownList("config", new List<SelectListItem> { new SelectListItem { Text = "全部加载", Value = "0", Selected = true }, new SelectListItem { Text = "按需加载", Value = "1" } }, new { @class = "bee-input-input bee-input-medium" })                                                
+                        @Html.DropDownList("config", new List<SelectListItem> { new SelectListItem { Text = "全部加载", Value = "0", Selected = true }, new SelectListItem { Text = "按需加载", Value = "1" } }, new { @class = "bee-input-input bee-input-medium" })
                         <button id="queryHistory" class="bee-button bee-button-plain bee-button-medium" style="margin-right: 5px; vertical-align: bottom;">
                             <span class="bee-button-value">集成历史</span>
                         </button>
                         <button id="clear" class="bee-button bee-button-plain bee-button-medium" style="margin-right: 20px; vertical-align: bottom;">
                             <span class="bee-button-value">清空列表</span>
                         </button>
+                        <span style="color:red;margin-right:15px;"><i>*建议使用Chrome浏览器访问页面</i></span>
                     </div>
                 </div>
                 <div class="toIntegrate-list">
