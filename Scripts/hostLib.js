@@ -8,7 +8,8 @@ var hostAddr = {
     system_config: ip + '/api/system/config/',
     scene: ip + '/api/scene/',
     authority: ip + '/api/appkey/',
-    equPropGroup: ip +'/api/equPropGroup/'
+    equPropGroup: ip + '/api/equPropGroup/',
+    threshold: ip + '/api/equThreshold/'
 };
 
 var method = {

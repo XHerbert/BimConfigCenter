@@ -1,0 +1,194 @@
+﻿
+@{
+    ViewBag.Title = "获取设备阈值列表";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<SelectListItem> projectId = ViewBag.SelectItems as List<SelectListItem>;
+    IDictionary<int, string> projects = ViewBag.Projects as Dictionary<int, string>;
+}
+<div class="row">&nbsp;</div>
+<div class="alert alert-danger">
+    <b>* 说明：使用说明请参考【帮助文档】</b>
+</div>
+<div class="table-box" style="margin: 20px;">
+    <div id="toolbar">
+        <button id="button" onclick="$.fn.createRowData()" class="btn btn-success">创建阈值配置项</button>
+        <span style="color:red;"></span>
+    </div>
+    <table id="table"></table>
+</div>
+
+<div style="display:none" id="form">
+    <form class="form-group">
+
+    </form>
+</div>
+
+<link rel="stylesheet" href="~/Content/bootstrap-table.min.css">
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/bootstrap-switch.min.js"></script>
+<script src="~/Scripts/bootstrap-table.min.js"></script>
+<script src="~/Scripts/bootstrap-table-zh-CN.min.js"></script>
+<script src="~/layer/layer.js"></script>
+<script src="~/Scripts/hostLib.js"></script>
+
+<script type="text/javascript">
+    let _project_list = @Html.Raw(ViewBag.Projects);
+    let host = hostAddr.threshold + 'getAllThreshold';
+    let $table = $('#table');
+    let $button = $('#button');
+
+    //数据 类型格式化
+    $.fn.dataTypeFormatter = (value, row, index) => {
+        // 1枚举  2数字  3字符串   4布尔   5附件  6区间数字
+        switch (value) {
+            case 1:
+                return '<span width="100%" class="btn btn-small btn-primary">枚举</span>';
+            case 2:
+                return '<span width="100%" class="btn btn-small btn-success">数字</span>';
+            case 3:
+                return '<span width="100%" class="btn btn-small btn-warning">字符</span>';
+            case 4:
+                return '<span class="btn btn-small btn-info">布尔</span>';
+            case 5:
+                return '<span class="btn btn-small btn-danger">附件</span>';
+            case 6:
+                return '<span class="btn btn-small btn-default">区间</span>';
+            default:
+                return 'N/A';
+        }
+    }
+
+    //操作按钮格式化
+    $.fn.buttonFormatter = (value, row, index) => {
+        let __content = '<button onclick = "$.fn.updateRowData(' + row['id'] + ')" class="btn btn-warning btn-small">修改</button>';
+        return [__content];
+    }
+
+    //色值格式化
+    $.fn.colorFormatter = (value, row, index) => {
+        console.log(value);
+        if (null == value) return;
+
+        return '<span class="btn btn-small" style="color:white;background-color:' + value + '">' + value + '</span>';
+
+    }
+
+    // 下拉列表
+    $.fn.dropdownFormat = (value, row, index) => {
+        let __projects = _project_list;
+        let __item = row['projectId'];
+        let __drop = '<select onchange="$.fn.selectChange(this)" class="form-control" id="projectId" name="projectId">';
+        __drop += row['sceneId'] === undefined ? '<option selected="selected" value="-1">请选择项目</option>' : '<option value="-1">请选择项目</option>';
+
+        for (let i = 0, len = __projects.length; i < len; i++) {
+            let __current = __projects[i];
+            if (__item && __item === __current.Id) {
+                __drop += '<option selected="selected" value="' + __current.Id + '">' + __current.Name + '</option>';
+            } else {
+                __drop += '<option value="' + __current.Id + '">' + __current.Name + '</option>';
+            }
+        }
+        __drop += '</select>';
+        return __drop;
+    }
+
+    //更新阈值配置
+    $.fn.updateRowData = (id) => {
+        let __row = $table.bootstrapTable('getRowByUniqueId', id);
+        layer.msg(__row['valueSet'], { icon: 1 });
+    }
+
+    //创建阈值配置
+    $.fn.createRowData = () => {
+        layer.msg("创建配置", { icon: 1 });
+    }
+    
+    // 初始化表格
+    $table.bootstrapTable({
+        url: host,
+        toolbar: '#toolbar',
+        clickEdit: false,
+        striped: true,
+        undefinedText: 'N/A',
+        //showToggle: true,
+        pagination: true,       //显示分页条
+        showColumns: true,
+        showRefresh: true,      //显示刷新按钮
+        clickToSelect: false,  //点击row选中radio或CheckBox
+        showToggle: false, //是否显示详细视图和列表视图的切换按钮
+        cardView: false, //是否显示详细视图
+        detailView: false, //是否显示父子表
+        uniqueId: 'id',
+        responseHandler: (response) => {
+            return response.data;
+        },
+        columns: [
+            {
+                checkbox: true
+            },
+            {
+                field: 'id',
+                visible: false
+            },
+            {
+                field: 'equId',
+                title: '设备Id'
+            },
+            {
+                field: 'projectId',
+                title: '所属项目',
+                width: '250px',
+                formatter: $.fn.dropdownFormat
+            },
+            {
+                field: 'propName',
+                title: '属性名称'
+            },
+            {
+                field: 'propCode',
+                title: '属性编码'
+            },
+            {
+                field: 'propType',
+                title: '数据类型',
+                width: '90px',
+                formatter:$.fn.dataTypeFormatter
+            },
+            {
+                field: 'valueSet',
+                title: '阈值'
+            },
+            {
+                field: 'propUnit',
+                title: '单位'
+            },
+            {
+                field: 'valueSrc',
+                title: '来源'
+            },
+            {
+                field: 'color',
+                title: '色值',
+                formatter:$.fn.colorFormatter
+            },
+            {
+                field: 'rangeMin',
+                title: '区间最小值'
+            },
+            {
+                field: 'rangeMax',
+                title: '区间最大值'
+            },
+            {
+                title: '操作',
+                width: '90px',
+                formatter: $.fn.buttonFormatter
+            }
+        ],
+
+        onClickCell: (field, value, row, $element) => {
+
+        }
+    });
+</script>

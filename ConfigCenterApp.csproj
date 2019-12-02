@@ -274,6 +274,7 @@
     <Content Include="Views\Device\DeviceGroup.cshtml" />
     <Content Include="Views\Device\ConvertReferenceView.cshtml" />
     <Content Include="Views\Weight\Index.cshtml" />
+    <Content Include="Views\Device\GetThresholdList.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
