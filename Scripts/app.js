@@ -1,6 +1,7 @@
 ﻿/// <reference path="jquery-3.3.1.min.js" />
 
 var integrate_filelist = [];
+var render_filelist = [];
 var integrate_data;
 var configdata;
 var descDom = $("tr#desc");
@@ -60,7 +61,6 @@ document.getElementById("query").addEventListener("click", function () {
     $.ajax(option);
 });
 
-
 // integrate button
 document.getElementById("integrate").addEventListener('keyup', function () {
     let inputVal = $("#integrate").val();
@@ -70,7 +70,6 @@ document.getElementById("integrate").addEventListener('keyup', function () {
         $("#beginbtn").addClass("bee-button-disabled");
     }
 });
-
 
 // clear file items
 document.getElementById('clear').addEventListener("click", function () {
@@ -168,7 +167,6 @@ document.getElementById("beginbtn").addEventListener("click", function () {
     $.ajax(options);
 });
 
-
 // query history of integrate
 document.getElementById("queryHistory").addEventListener("click", function () {
 
@@ -210,6 +208,100 @@ document.getElementById("queryHistory").addEventListener("click", function () {
 });
 
 
+// filter by specialty
+document.getElementById('filter_specialty').addEventListener("click", function () {
+    let file_count = calcFileCount();
+    if (file_count === 0) {
+        layer.msg('请选择参与集成的文件列表', { icon: 5 });
+        return;
+    }
+    //获取列表中所有的专业
+    let specialtyArray = [];
+    let domHtml = '';
+    for (let o = 0; o < render_filelist.length; o++) {
+        let val = render_filelist[o].specialty;
+        if (specialtyArray.indexOf(val) === -1) {
+            specialtyArray.push(val);
+            domHtml += '<li class="list-group-item" style="margin-right:15px;margin-left:15px">';
+            domHtml += '<div class="has-success">';
+            domHtml += '<div class="checkbox">';
+            domHtml += '<label><input type="checkbox" id="checkboxSuccess" name="f_specialty" value="' + val + '">';
+            domHtml += val;
+            domHtml += '</label></div></div></li>';
+        }
+    }
+    $('#filter_spe_panel_ul').html('');
+    $('#filter_spe_panel_ul').html(domHtml);
+    layer.open({
+        type: 1,
+        title: '按专业过滤',
+        area: ['400px', '280px'],
+        content: $("#filter_spe_panel"),
+        btn: ['确认', '取消'],
+        //下标1开始：index，layero当前弹窗对象
+        yes: function (index, layero) {
+            console.log(specialtyArray);
+            let _condition = [];
+            $('input[name="f_specialty"]').each(item => {
+                if ($('input[name="f_specialty"]')[item].checked) {
+                    _condition.push($('input[name="f_specialty"]')[item].value);
+                }
+            });
+            // 重新渲染当前列表
+            filterByCondition(render_filelist, _condition, false);
+            layer.close(index);
+        }
+    });
+});
+
+
+// filter by floor
+document.getElementById('filter_floor').addEventListener("click", function () {
+    let file_count = calcFileCount();
+    if (file_count === 0) {
+        layer.msg('请选择参与集成的文件列表', { icon: 5 });
+        return;
+    }
+    //获取列表中所有的专业
+    let floorArray = [];
+    let domHtml = '';
+    for (let o = 0; o < render_filelist.length; o++) {
+        let val = render_filelist[o].floor;
+        if (floorArray.indexOf(val) === -1) {
+            floorArray.push(val);
+            domHtml += '<li class="list-group-item" style="margin-right:15px;margin-left:15px">';
+            domHtml += '<div class="has-success">';
+            domHtml += '<div class="checkbox">';
+            domHtml += '<label><input type="checkbox" name="f_floor" id="checkboxSuccess" value="' + val + '">';
+            domHtml += val;
+            domHtml += '</label></div></div></li>';
+        }
+    }
+    $('#filter_floor_panel_ul').html('');
+    $('#filter_floor_panel_ul').html(domHtml);
+
+    layer.open({
+        type: 1,
+        title: '按楼层过滤',
+        area: ['400px', '280px'],
+        content: $("#filter_floor_panel"),
+        btn: ['确认', '取消'],
+        yes: function (index, layero) {
+            console.log(floorArray);
+            let _condition = [];
+            let $f_floor = $('input[name="f_floor"]');
+            $f_floor.each(item => {
+                if ($f_floor[item].checked) {
+                    _condition.push($f_floor[item].value);
+                }
+            });
+            // 重新渲染当前列表
+            filterByCondition(render_filelist, _condition, true);
+            layer.close(index);
+        }
+    });
+});
+
 // add items
 function addThis(obj) {
     if (obj.getAttribute('data-added') === "true") return;
@@ -231,19 +323,15 @@ function addThis(obj) {
 
     tr += '<td width="150">';
     tr += '<input type="text" data-file="' + floor + '" value="' + floor + '" class="bee-input-input bee-input-medium" style="width:198px" name="floor" /></td>';
-    //todo data binding
-    //tr += '<select class="bee-input-input bee-input-medium" style="width:180px" name="floor">';
-    //tr += '<option value="' + floor + '" selected>' + floor + '</option>';
-    //tr += '</select></td>';
 
     tr += '<td width="80"><a style="cursor:pointer" onclick="removeThis(this)" data-id="' + fileId + '">移除</a></td></tr>';
     obj.innerText = '已添加';
     obj.setAttribute('data-added', true);
     obj.style.color = 'red';
     $('table#integs').append(tr);
+    render_filelist.push({ fileId: Number(fileId), fileName: name, floor: floor, specialty: spe });
     calcFileCount();
 }
-
 
 // remove items
 function removeThis(obj) {
@@ -253,10 +341,18 @@ function removeThis(obj) {
     $(obj).closest('tr').remove();
     $(domId).css('color', '#57eac1');
     $(domId).attr('data-added', false);
-
+    if (integrate_filelist.length !== render_filelist.length) {
+        layer.msg("数据不一致");
+        return;
+    }
     for (let i = 0, len = integrate_filelist.length; i < len; i++) {
         if (id === integrate_filelist[i].fileId.toString()) {
             integrate_filelist.splice(i, 1);
+        }
+    }
+    for (let i = 0, len = render_filelist.length; i < len; i++) {
+        if (id === render_filelist[i].fileId.toString()) {
+            render_filelist.splice(i, 1);
         }
     }
     if ($('#integs input').length === 0) {
@@ -264,7 +360,6 @@ function removeThis(obj) {
     }
     calcFileCount();
 }
-
 
 // load sub files
 function loadSubFiles(load) {
@@ -276,36 +371,44 @@ function loadSubFiles(load) {
         type: "GET",
         cache: false,
         success: function (response) {
-            $("tr#desc").css("display", "none");
-            let respo = response.data;
-            let size = respo.length;
-            $('table#integs').empty();
-            for (let k = 0; k < size; k++) {
-                let resp = response.data[k];
-                let data = { "fileId": Number(resp.fileId), "floor": resp.floor, "specialty": resp.specialty };
-
-                let tr = '<tr class="tr-index" data-fileId="' + resp.fileId + '" data-spe="' + resp.specialty + '" data-floor="' + resp.floor + '"><td><span class="name">fileId:</span>' + resp.fileId + '<br>' + resp.fileName + '</td>';
-                tr += '<td width="150">';
-                tr += '<input type="text"  data-file="' + resp.fileId + '" value="' + resp.specialty + '" class="bee-input-input bee-input-medium" style="width:198px" name="specialty" /></td>';
-                tr += '<td width="150">';
-                tr += '<input type="text"  data-file="' + resp.floor + '" value="' + resp.floor + '" class="bee-input-input bee-input-medium" style="width:198px" name="floor" /></td>';
-                //todo data binding 
-                //tr += '<select class="bee-input-input bee-input-medium" style="width:180px" name="floor">';
-                //tr += '<option value="' + resp.floor + '" selected>' + resp.floor + '</option>';
-                //tr += '</select></td>';
-                tr += '<td width="80"><a style="cursor:pointer" onclick="removeThis(this)" data-id="' + resp.fileId + '">移除</a></td></tr>';
-                $('table#integs').append(tr);
-            }
-            calcFileCount();
-            // close current dialog
-            $("#his").css("display", "none");
-            $("div.bee-modal-mask").css("display", "none");
+            //载入后左侧列表恢复
+            render_filelist = [];
+            renderSubFiles(response.data);
+            response.data.forEach((item, index) => {
+                render_filelist.push(item);
+            });
+            console.log("render_filelist", render_filelist);
         }
     };
 
     // send request
     $.ajax(options);
 }
+
+// reder sub files
+function renderSubFiles(fileArray) {
+    $("tr#desc").css("display", "none");
+    let respo = fileArray;
+    let size = respo.length;
+    $('table#integs').empty();
+    for (let k = 0; k < size; k++) {
+        let resp = fileArray[k];
+        let data = { "fileId": Number(resp.fileId), "floor": resp.floor, "specialty": resp.specialty };
+
+        let tr = '<tr class="tr-index" data-fileId="' + resp.fileId + '" data-spe="' + resp.specialty + '" data-floor="' + resp.floor + '"><td><span class="name">fileId:</span>' + resp.fileId + '<br>' + resp.fileName + '</td>';
+        tr += '<td width="150">';
+        tr += '<input type="text"  data-file="' + resp.fileId + '" value="' + resp.specialty + '" class="bee-input-input bee-input-medium" style="width:198px" name="specialty" /></td>';
+        tr += '<td width="150">';
+        tr += '<input type="text"  data-file="' + resp.floor + '" value="' + resp.floor + '" class="bee-input-input bee-input-medium" style="width:198px" name="floor" /></td>';
+        tr += '<td width="80"><a style="cursor:pointer" onclick="removeThis(this)" data-id="' + resp.fileId + '">移除</a></td></tr>';
+        $('table#integs').append(tr);
+    }
+    calcFileCount();
+    // close current dialog
+    $("#his").css("display", "none");
+    $("div.bee-modal-mask").css("display", "none");
+}
+
 
 // calculate integrate files
 function calcFileCount(count) {
@@ -315,6 +418,29 @@ function calcFileCount(count) {
     }
     let ct = $('.tr-index').length;
     $('#fct').text(ct);
+    return ct;
 }
 
+// render list
+function filterByCondition(arrayData, conditionArr, isFloor) {
+    if (!conditionArr || conditionArr.length === 0) {
+        renderSubFiles(render_filelist);
+        return;
+    }
+    let result = [];
+    for (let i = 0; i < conditionArr.length; i++) {
+        for (let j = 0; j < arrayData.length; j++) {
+            if (isFloor) {
+                if (arrayData[j].floor === conditionArr[i]) {
+                    result.push(arrayData[j]);
+                }
+            } else {
+                if (arrayData[j].specialty === conditionArr[i]) {
+                    result.push(arrayData[j]);
+                }
+            }
+        }
+    }
+    renderSubFiles(result);
+}
 

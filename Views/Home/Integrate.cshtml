@@ -54,11 +54,11 @@
                             <th class="head">源文件</th>
                             <th width="150" class="head">
                                 专业
-                                <i class="iconfont icon-setting fixicon fixhover"></i>
+                                <i id="filter_specialty" class="iconfont icon-setting fixicon fixhover"></i>
                             </th>
                             <th width="150" class="head">
                                 楼层
-                                <i class="iconfont icon-setting fixicon fixhover"></i>
+                                <i id="filter_floor" class="iconfont icon-setting fixicon fixhover"></i>
                             </th>
                             <th width="80" class="head">操作</th>
                         </tr>
@@ -101,6 +101,18 @@
         </div>
     </div> <div class="bee-modal-footer"></div>
 </div>
+
+
+<div style="display:none" id="filter_spe_panel">
+    <ul class="list-group" id="filter_spe_panel_ul">        
+    </ul>
+</div>
+
+<div style="display:none" id="filter_floor_panel">
+    <ul class="list-group" id="filter_floor_panel_ul">        
+    </ul>
+</div>
+
 <link rel="stylesheet" type="text/css" href="@Url.Content("~/Content/develop.css")">
 <script type="text/javascript" src="@Url.Content("~/Scripts/jquery-3.3.1.min.js")"></script>
 <script src="~/Scripts/bootstrap.min.js"></script>
@@ -109,6 +121,5 @@
 <script type="text/javascript" src="@Url.Content("~/Scripts/app.js")"></script>
 <script type="text/javascript">
     $("[name='ss']").bootstrapSwitch();
-    $("[name='loadChangeFile']").bootstrapSwitch();
-    
+    $("[name='loadChangeFile']").bootstrapSwitch();    
 </script>
