@@ -7,7 +7,6 @@ var configdata;
 var descDom = $("tr#desc");
 var host = "http://10.0.197.82:8078/api/";
 
-
 // Get list of model files
 document.getElementById("query").addEventListener("click", function () {
     let val = document.getElementById("proj").value;
@@ -76,15 +75,15 @@ document.getElementById('clear').addEventListener("click", function () {
     $('#integs').html('');
     $('#integs').append(descDom);
     $("tr#desc").css("display", "block");
+    render_filelist = [];
+    integrate_filelist = [];
     calcFileCount(0);
 });
-
 
 // send integrate
 document.getElementById("beginbtn").addEventListener("click", function () {
     // verify data
 
-    console.log(integrate_filelist);
     let inputs_spe = $('#integs input[name="specialty"]');
     if (inputs_spe.length === 0) {
         layer.alert('请添加模型', {
@@ -110,6 +109,7 @@ document.getElementById("beginbtn").addEventListener("click", function () {
         let data = { "fileId": Number(fileId), "floor": floor, "specialty": spe };
         integrate_filelist.push(data);
     }
+    console.log("integrate_filelist", integrate_filelist);
 
     let integrate_name = document.getElementById("integrate").value;
     let config = document.getElementById("config");
@@ -207,7 +207,6 @@ document.getElementById("queryHistory").addEventListener("click", function () {
     $.ajax(options);
 });
 
-
 // filter by specialty
 document.getElementById('filter_specialty').addEventListener("click", function () {
     let file_count = calcFileCount();
@@ -253,7 +252,6 @@ document.getElementById('filter_specialty').addEventListener("click", function (
         }
     });
 });
-
 
 // filter by floor
 document.getElementById('filter_floor').addEventListener("click", function () {
@@ -341,20 +339,20 @@ function removeThis(obj) {
     $(obj).closest('tr').remove();
     $(domId).css('color', '#57eac1');
     $(domId).attr('data-added', false);
-    if (integrate_filelist.length !== render_filelist.length) {
-        layer.msg("数据不一致");
-        return;
-    }
     for (let i = 0, len = integrate_filelist.length; i < len; i++) {
         if (id === integrate_filelist[i].fileId.toString()) {
             integrate_filelist.splice(i, 1);
+            break;
         }
     }
+    console.log("integrate_filelist:", integrate_filelist.length);
     for (let i = 0, len = render_filelist.length; i < len; i++) {
         if (id === render_filelist[i].fileId.toString()) {
             render_filelist.splice(i, 1);
+            break;
         }
     }
+    console.log("render_filelist:", render_filelist.length);
     if ($('#integs input').length === 0) {
         $("tr#desc").css("display", "block");
     }
@@ -408,7 +406,6 @@ function renderSubFiles(fileArray) {
     $("#his").css("display", "none");
     $("div.bee-modal-mask").css("display", "none");
 }
-
 
 // calculate integrate files
 function calcFileCount(count) {
