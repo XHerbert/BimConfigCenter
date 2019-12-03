@@ -123,9 +123,9 @@
             console.log(row);
             let __content = '';
             if (isShow) {
-                __content = '<input class="_switch_" style="visibility:hidden;"  id="show' + row['paramId'] + '"  data-show = true  data-param-id = ' + row['paramId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="show_checkbox" checked>';
+                __content = '<input class="_switch_" style="visibility:hidden;" data-sys-code = ' + row['systemCode'] + ' id="show' + row['paramId'] + '"  data-show = true  data-param-id = ' + row['paramId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="show_checkbox" checked>';
             } else {
-                __content = '<input class="_switch_" style="visibility:hidden;" id="show' + row['paramId'] + '"  data-show = false data-param-id = ' + row['paramId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="show_checkbox">';
+                __content = '<input class="_switch_" style="visibility:hidden;" data-sys-code = ' + row['systemCode'] + ' id="show' + row['paramId'] + '"  data-show = false data-param-id = ' + row['paramId'] + ' type="checkbox" data-on-text="显示" data-off-text="隐藏"  data-off-color="warning" name="show_checkbox">';
             }
             return __content;
         }
@@ -142,6 +142,9 @@
                 theadClasses: "thead-dark",
                 pageSize: 10,
                 pageList: [10, 25],
+                responseHandler: (response) => {
+                    return response.data;
+                },
                 columns: [
                     {
                         field: 'groupName',
@@ -181,58 +184,70 @@
             let sysCode = row.systemCode;
             let cur_table = $detail.html('<table></table>').find('table');
             $(cur_table).bootstrapTable({
-                url: host +'getExpandEquGroupPropertyList',
+                url: host + 'getExpandEquGroupPropertyList',
                 method: 'get',
                 queryParams: { projectId: $projectId.val(), systemCode: sysCode, groupName: groupName },
-
+                responseHandler: (response) => {
+                    return response.data;
+                },
                 clickToSelect: true,
                 detailView: false,
                 uniqueId: "paramId",
                 pageSize: 10,
                 pageList: [10, 25],
                 columns: [{
-                        field: 'paramName',
-                        title: '属性名称'
-                    }, {
-                        field: 'paramId',
-                        title: '属性代码'
-                    }, {
-                        field: 'systemCode',
-                        title: '排序'
-                    }, {
-                        field: 'isShow',
-                        title: '是否在设备标签中显示',
-                        formatter: $.fn.switchFormatter
-                    }],
+                    field: 'paramName',
+                    title: '属性名称'
+                }, {
+                    field: 'paramId',
+                    title: '属性代码'
+                }, {
+                    field: 'systemCode',
+                    title: '排序'
+                }, {
+                    field: 'isShow',
+                    title: '是否在设备标签中显示',
+                    formatter: $.fn.switchFormatter
+                }],
                 onLoadSuccess: function (index, row, $Subdetail) {
                     console.log("groupName:" + groupName);
                     $.fn.initSwitch(groupName, true);
                 }
             });
-            
+
         };
 
         // 按是否显示初始化插件
         $.fn.initSwitch = () => {
-            
             setTimeout(() => {
-               
                 let $filterTrue = $('input._switch_').filter($.fn.checkIsShowTrueValue);
                 let $filterFalse = $('input._switch_').filter($.fn.checkIsShowFalseValue);
                 $filterTrue.bootstrapSwitch("state", true, false);
                 $filterFalse.bootstrapSwitch("state", false, false);
-                console.log("$filterTrue:" + $filterTrue.length);
-                console.log("$filterFalse:" + $filterFalse.length);
+                $('input._switch_').bootstrapSwitch("onSwitchChange", (event, state) => {
+                    let param = event.target.getAttribute('data-param-id');
+                    let syscode = event.target.getAttribute('data-sys-code');
+                    let show = state == true ? 1 : 0;
 
-                
-                $('input._switch_').bootstrapSwitch({
-                    onSwitchChange: (event, state) => {
-                        let which = event.target.attributes['data-show'].value;
-                        layer.msg(which);
-                    }
+                    //TODO:项目Id不能写死
+                    let data = { projectId: 366, paramId: Number(param), systemCode: syscode, isShow: show };
+                    
+                    let options = {
+                        url: hostAddr.equPropGroup + 'setColumnVisible',
+                        data: JSON.stringify(data),
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        success: (response) => {
+                            if (response.code === 20000) {
+                                layer.msg("更新成功！", { icon: 1 });
+                            } else {
+                                layer.msg(response.message, { icon: 5 });
+                            }
+                        }
+                    };
+                    $.ajax(options);
                 });
-                
-            }, 250)
+            }, 100)
         }
 
         $.fn.checkIsShowTrueValue = (val) => {
