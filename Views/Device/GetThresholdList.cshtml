@@ -17,9 +17,85 @@
     <table id="table"></table>
 </div>
 
-<div style="display:none" id="form">
-    <form class="form-group">
+<div style="display:none" id="myform">
+    <form class="form-horizontal center-block" role="form">
+        <div class="col-md-12">
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="equId" title="EQU_ID">设备</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="equId" name="equId" type="text" placeholder="请选择设备" required />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="projectId" title="PROJECT_ID">关联项目</label>
+                <div class="col-md-9">
+                    @Html.DropDownList("projectId", projectId, new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="propName" title="PROP_NAME">属性名称</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="propName" name="propName" type="text" placeholder="请输入属性名称" required />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="propCode" title="PROP_CODE">属性编码</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="propCode" type="text" name="propCode" placeholder="请输入属性编码" />
+                </div>
+            </div>
 
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="propType" title="PROP_TYPE">数据类型</label>
+                <div class="col-md-9">
+                    <select name="propType" id="propType" class="form-control">
+                        <option value="1" selected>枚举</option>
+                        <option value="2">数字</option>
+                        <option value="3">字符</option>
+                        <option value="4">布尔</option>
+                        <option value="5">附件</option>
+                        <option value="6">区间</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="valueSet" title="VALUE_SET">阈值</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="valueSet" type="text" name="valueSet" placeholder="请输入阈值" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="propUnit" title="PROP_UNIT">单位</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="propUnit" type="text" name="propUnit" placeholder="请输入单位" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="valueSrc" title="VALUE_SRC">来源</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="valueSrc" type="text" name="valueSrc" placeholder="请输入单位" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="color" title="COLOR">色值</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="color" type="text" name="color" placeholder="请选择色值" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="rangeMax" title="RANGE_MAX">区间最大值</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="rangeMax" type="number" name="rangeMax" placeholder="区间最大值" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="rangeMin" title="RANGE_MIN">区间最小值</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="rangeMin" type="number" name="rangeMin" placeholder="区间最小值" />
+                </div>
+            </div>
+            <input type="hidden" id="id" name="id" />
+        </div>
     </form>
 </div>
 
@@ -67,7 +143,6 @@
 
     //色值格式化
     $.fn.colorFormatter = (value, row, index) => {
-        console.log(value);
         if (null == value) return;
 
         return '<span class="btn btn-small" style="color:white;background-color:' + value + '">' + value + '</span>';
@@ -96,14 +171,107 @@
     //更新阈值配置
     $.fn.updateRowData = (id) => {
         let __row = $table.bootstrapTable('getRowByUniqueId', id);
-        layer.msg(__row['valueSet'], { icon: 1 });
+        $.fn.setForm(__row);
+        layer.open({
+            type: 1,
+            title: "修改阈值配置项",
+            skin: 'layui-layer-rim',
+            area: ['480px', '650px'],
+            content: $('#myform'),
+            btn: ['修改', '取消'],
+            yes: (index, layero) => {
+                let options = {
+                    url: hostAddr.threshold + 'updateThreshold',
+                    data: JSON.stringify($.fn.getForm()),
+                    type: 'PUT',
+                    contentType: 'application/json',
+                    success: (response) => {
+                        layer.close(index);
+                        if (response.code === 20000) {
+                            layer.msg("更新成功！", { icon: 1 });
+                            $table.bootstrapTable('refresh');
+                        } else {
+                            layer.msg(response.message, { icon: 5 });
+                        }
+                    }
+                };
+                $.ajax(options);
+            }
+        });
     }
 
     //创建阈值配置
     $.fn.createRowData = () => {
-        layer.msg("创建配置", { icon: 1 });
+        layer.open({
+            type: 1,
+            title:"创建阈值配置项",
+            skin: 'layui-layer-rim',
+            area: ['480px', '650px'],
+            content: $('#myform'),
+            btn: ['创建', '取消'],
+            yes: (index, layero) => {
+                let data = $.fn.getForm();
+                console.log(JSON.stringify(data));
+                let options = {
+                    url: hostAddr.threshold + 'createThreshold',
+                    data: JSON.stringify(data),
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: (response) => {
+                        layer.close(index);
+                        if (response.code === 20000) {
+                            layer.msg("创建成功！", { icon: 1 });
+                            $table.bootstrapTable('refresh');
+                        } else {
+                            layer.msg(response.message, { icon: 5 });
+                        }
+                    }
+                };
+                $.ajax(options);
+            }
+        });
     }
-    
+
+    //获取Form表单数据
+    $.fn.getForm = () => {
+        let obj = {};
+        let $form = $('form');
+        let array = $form.serializeArray();
+        $.each(array, function () {
+            if (this.value != null && this.value != undefined && this.value!=="") {
+                obj[this.name] = this.value;
+            }
+        });
+        return obj;
+    }
+
+    //设置Form表单数据
+    $.fn.setForm = (jsonValue) => {
+        let obj = $('form');
+        $.each(jsonValue, function (name, ival) {
+            if (name == "0") return;
+            console.log();
+            var $input = obj.find("input[name='" + name + "']");
+            if ($input.attr("type") == "radio" || $input.attr("type") == "checkbox") {
+                $input.each(function () {
+                    if (Object.prototype.toString.apply(ival) == '[object Array]') {
+                        for (var i = 0; i < ival.length; i++) {
+                            if ($(this).val() == ival[i])
+                                $(this).attr("checked", "checked");
+                        }
+                    } else {
+                        if ($(this).val() == ival)
+                            $(this).attr("checked", "checked");
+                    }
+                });
+            } else if ($input.attr("type") == "textarea") {
+                obj.find("[name=" + name + "]").html(ival);
+            } else {
+                obj.find("[name=" + name + "]").val(ival);
+            }
+        });
+    }
+
     // 初始化表格
     $table.bootstrapTable({
         url: host,
@@ -111,14 +279,13 @@
         clickEdit: false,
         striped: true,
         undefinedText: 'N/A',
-        //showToggle: true,
         pagination: true,       //显示分页条
         showColumns: true,
         showRefresh: true,      //显示刷新按钮
-        clickToSelect: false,  //点击row选中radio或CheckBox
-        showToggle: false, //是否显示详细视图和列表视图的切换按钮
-        cardView: false, //是否显示详细视图
-        detailView: false, //是否显示父子表
+        clickToSelect: false,   //点击row选中radio或CheckBox
+        showToggle: false,      //是否显示详细视图和列表视图的切换按钮
+        cardView: false,        //是否显示详细视图
+        detailView: false,      //是否显示父子表
         uniqueId: 'id',
         responseHandler: (response) => {
             return response.data;
