@@ -83,15 +83,15 @@
                 </div>
             </div>
             <div class="form-group ">
-                <label class="col-md-3 control-label" for="rangeMax" title="RANGE_MAX">区间最大值</label>
-                <div class="col-md-9">
-                    <input class="form-control" id="rangeMax" type="number" name="rangeMax" placeholder="区间最大值" />
-                </div>
-            </div>
-            <div class="form-group ">
                 <label class="col-md-3 control-label" for="rangeMin" title="RANGE_MIN">区间最小值</label>
                 <div class="col-md-9">
                     <input class="form-control" id="rangeMin" type="number" name="rangeMin" placeholder="区间最小值" />
+                </div>
+            </div>
+            <div class="form-group ">
+                <label class="col-md-3 control-label" for="rangeMax" title="RANGE_MAX">区间最大值</label>
+                <div class="col-md-9">
+                    <input class="form-control" id="rangeMax" type="number" name="rangeMax" placeholder="区间最大值" />
                 </div>
             </div>
             <input type="hidden" id="id" name="id" />
@@ -190,6 +190,7 @@
                         if (response.code === 20000) {
                             layer.msg("更新成功！", { icon: 1 });
                             $table.bootstrapTable('refresh');
+                            $('form')[0].reset();
                         } else {
                             layer.msg(response.message, { icon: 5 });
                         }
@@ -202,6 +203,7 @@
 
     //创建阈值配置
     $.fn.createRowData = () => {
+        $('form')[0].reset();
         layer.open({
             type: 1,
             title:"创建阈值配置项",
